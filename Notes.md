@@ -1,10 +1,18 @@
 ## SQL commands
 - connection :
-    `psql -h 127.0.0.1 -U root postgres`
+    `psql -h 127.0.0.1 -U <user> <database>`
+- restart postgres   (windows):
+    `pg_ctl -D "C:\Program Files\PostgreSQL\14\data" restart`
+- create user:
+    `CREATE USER shopping_user WITH PASSWORD 'password123';`
+- grant user previleges:
+    `GRANT ALL PRIVILEGES ON DATABASE shopping TO shopping_user;`
+
 - create database:
     `CREATE DATABASE my_new_databse;`
 - create table:
-    `CREATE TABLE users(id SERIAL PRIMARY KEY,name VARCHAR(100), bio text, children integer, created date);`
+    `CREATE TABLE users(id SERIAL PRIMARY KEY,name VARCHAR(100), bio textSE, children integer, created date);`
+
 - insert record (create):
     `INSERT INTO users (name, bio, children, created) VALUES ('Ahmed', 'A techer', 1, '2021-12-3');`
 - select record(read):
@@ -27,6 +35,8 @@
     `\dt`
 - exit psql command:
     `\q`
+- show users:
+    `\du`
 
 ## for DB migration
 npm install -g `db-migrate`
