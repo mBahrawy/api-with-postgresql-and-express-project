@@ -14,8 +14,6 @@ const show = async (req: Request, res: Response) => {
 };
 
 const create = async (req: Request, res: Response) => {
-    console.log(req.body);
-    
     try {
         const book: Book = {
             title: req.body.title,
@@ -29,7 +27,6 @@ const create = async (req: Request, res: Response) => {
         res.json(newArticle);
     } catch (err) {
         console.log(err);
-
         res.status(400).json({
             "error": err
         });
