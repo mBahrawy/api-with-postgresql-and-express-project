@@ -47,14 +47,13 @@ export class BookSModel {
         }
     }
 
-    async delete(id: string): Promise<Book> {
+    async delete(id: string): Promise<string> {
         try {
             const sql = "DELETE FROM books WHERE id=($1)";
             const conn = await databaseClient.connect();
             const result = await conn.query(sql, [id]);
-            const book = result.rows[0];
             conn.release();
-            return book;
+            return `Book with ID: ${id} was deleted`;
         } catch (err) {
             throw new Error(`Could not delete book ${id}. Error: ${err}`);
         }

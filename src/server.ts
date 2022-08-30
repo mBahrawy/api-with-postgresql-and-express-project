@@ -4,7 +4,6 @@ import routes from "./routes/index.api";
 import path from "path";
 import cors from "cors";
 import * as dotenv from "dotenv";
-import booksRouteHandler from './handlers/books-route.handler';
 
 // Defining app base folder
 global.__basedir = __dirname;

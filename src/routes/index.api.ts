@@ -1,6 +1,8 @@
 import express, { Request, Response, Router } from "express";
-import booksRouteHandler from "../handlers/books-route.handler";
+import booksRouteHandler from "./api/books-route.handler";
+import usersRouteHandler from "./api/users-route.handler";
 import logger from "../services/logging.service";
+import loginRouteHandler from "./api/login-route.handler";
 
 const routes: Router = express.Router();
 
@@ -16,6 +18,8 @@ routes.get("/", logger, (req: Request, res: Response) => {
 });
 
 booksRouteHandler(routes);
+usersRouteHandler(routes);
+loginRouteHandler(routes);
 
 // Backedend routes
 routes.get("*", logger, (req: Request, res: Response) => {

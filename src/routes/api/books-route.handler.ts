@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import { Book, BookSModel } from "../models/book.model";
+import { Book, BookSModel } from "../../models/book.model";
 
 const booksModel = new BookSModel();
 
