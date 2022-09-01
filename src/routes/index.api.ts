@@ -1,8 +1,8 @@
 import express, { Request, Response, Router } from "express";
-import booksRouteHandler from "./api/books-route.handler";
 import usersRouteHandler from "./api/users-route.handler";
 import logger from "../services/logging.service";
 import loginRouteHandler from "./api/login-route.handler";
+import productsRouteHandler from "./api/products-route.handler";
 
 const routes: Router = express.Router();
 
@@ -17,7 +17,7 @@ routes.get("/", logger, (req: Request, res: Response) => {
     res.status(200).send(`<h2>Welcome to store front API</h2>`);
 });
 
-booksRouteHandler(routes);
+productsRouteHandler(routes);
 usersRouteHandler(routes);
 loginRouteHandler(routes);
 

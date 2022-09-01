@@ -1,51 +1,47 @@
 import databaseClient from "../database";
-import bcrypt from "bcrypt";
 import { Service } from "typedi";
 import { ErrorResponse } from "../interfaces/responses/ErrorResponse";
 import { FeedbackResponse } from "../interfaces/responses/FeedbackResponse";
-import { User } from "../interfaces/User";
+import { Product } from "../interfaces/Product";
 
-const saltRounds = process.env.SALT_ROUNDS as string;
-const pepper = process.env.BCRYPT_PASSWORD as string;
-
-interface UsersResponse extends ErrorResponse {
-    users?: User[];
+interface ProductsResponse extends ErrorResponse {
+    products?: Product[];
 }
-interface UserResponse extends ErrorResponse {
-    user?: User;
+interface ProductResponse extends ErrorResponse {
+    product?: Product;
 }
 
 @Service()
-export class UsersModel {
-    async index(): Promise<UsersResponse> {
+export class ProductsModel {
+    async index(): Promise<ProductsResponse> {
         try {
             const conn = await databaseClient.connect();
-            const sql = `SELECT id, name, username, email, role FROM users`;
+            const sql = `SELECT id, name, price, quantity, user_id FROM products`;
             const result = await conn.query(sql);
             conn.release();
 
             if (!result.rows.length) {
                 return {
                     status: 404,
-                    error: "No users were found"
+                    error: "No products were found"
                 };
             }
 
             return {
                 status: 200,
-                users: result.rows
+                products: result.rows
             };
         } catch (err) {
             throw {
-                message: "Could get get users.",
+                message: "Could not get products.",
                 sqlError: err
             };
         }
     }
 
-    async show(id: string): Promise<UserResponse> {
+    async show(id: string): Promise<ProductResponse> {
         try {
-            const sql = `SELECT id, name, username, email, role FROM users WHERE id=($1)`;
+            const sql = `SELECT id, name, price, quantity, user_id FROM products WHERE id=($1)`;
             const conn = await databaseClient.connect();
             const result = await conn.query(sql, [id]);
             conn.release();
@@ -53,38 +49,37 @@ export class UsersModel {
             if (!result.rowCount) {
                 return {
                     status: 404,
-                    error: "User was not found"
+                    error: "Product was not found"
                 };
             }
 
             return {
                 status: 200,
-                user: result.rows[0]
+                product: result.rows[0]
             };
         } catch (err) {
             throw {
-                message: "Could not get user.",
+                message: "Could not get product.",
                 sqlError: err
             };
         }
     }
 
-    async create(u: User): Promise<UserResponse> {
+    async create(p: Product, userID: number): Promise<ProductResponse> {
         try {
-            const sql = `INSERT INTO users (name, username, email, role, password_digist) VALUES($1, $2, $3, $4, $5) RETURNING *`;
+            const sql = `INSERT INTO products (name, price, quantity, user_id) VALUES($1, $2, $3, $4) RETURNING *`;
             const conn = await databaseClient.connect();
-            const hashedPassword = bcrypt.hashSync(u.password + pepper, parseInt(saltRounds));
-            const result = await conn.query(sql, [u.name, u.username, u.email, u.role, hashedPassword]);
-            const user = result.rows[0];
+            const result = await conn.query(sql, [p.name, p.price, p.quantity, userID]);
+            const product = result.rows[0];
             conn.release();
-            delete user.password_digist;
+            delete product.password_digist;
             return {
                 status: 200,
-                user
+                product
             };
         } catch (err) {
             throw {
-                message: "Could not add new user.",
+                message: "Could not create products.",
                 sqlError: err
             };
         }
@@ -92,7 +87,7 @@ export class UsersModel {
 
     async delete(id: string): Promise<FeedbackResponse | ErrorResponse> {
         try {
-            const sql = `DELETE FROM users WHERE id=($1)`;
+            const sql = `DELETE FROM products WHERE id=($1)`;
             const conn = await databaseClient.connect();
             const result = await conn.query(sql, [id]);
             conn.release();
@@ -100,17 +95,17 @@ export class UsersModel {
             if (!result.rowCount) {
                 return {
                     status: 404,
-                    error: "User was not found"
+                    error: "Product was not found"
                 };
             }
 
             return {
                 status: 200,
-                message: `User with ID: ${id} was deleted`
+                message: `Product with ID: ${id} was deleted`
             };
         } catch (err) {
             throw {
-                message: "Could not delete user.",
+                message: "Could not delete products.",
                 sqlError: err
             };
         }

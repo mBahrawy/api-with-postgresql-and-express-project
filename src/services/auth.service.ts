@@ -1,9 +1,19 @@
 import databaseClient from "../database";
 import bcrypt from "bcrypt";
-import { LoginRespond } from "../interfaces/responds/loginResponde";
+import { Service } from "typedi";
+import { JWT } from "./jwt.service";
+import { ErrorResponse } from "../interfaces/responses/ErrorResponse";
+import { User } from "../interfaces/User";
 
+interface LoginResponse extends ErrorResponse {
+    user?: User;
+}
+
+@Service()
 export class AuthService {
-    public static login = async (username: string, password: string): Promise<LoginRespond> => {
+    constructor(private jwt: JWT) {}
+
+    public login = async (username: string, password: string): Promise<LoginResponse> => {
         try {
             const pepper = process.env.BCRYPT_PASSWORD as string;
             const conn = await databaseClient.connect();
@@ -24,13 +34,19 @@ export class AuthService {
                     error: "Username/Password is not correct"
                 };
             }
+            delete user.password_digist;
+            const resUserData = { ...user, token: this.jwt.createToken(user) };
 
             return {
-                user: user,
+                user: resUserData,
                 status: 200
             };
-        } catch (e) {
-            throw new Error("Error happned during auth");
+        } catch (err) {
+            throw {
+                status: 500,
+                message: "Error happened during auth.",
+                sqlError: err
+            };
         }
     };
 }
