@@ -18,9 +18,7 @@ const productsAuthMiddleware = async (req: Request, res: Response, next: NextFun
         error: "Not authorized action"
     };
 
-    if (!req.headers.authorization) return forbiddenErrorResponse;
-
-    const token = req.headers.authorization;
+    const token = req.headers.authorization as string;
     const productRes = (await modal.show(req.params.id)) as ProductResponse;
     const createdUserId = productRes.product?.user_id as number;
 

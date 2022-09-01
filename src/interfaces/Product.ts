@@ -4,4 +4,5 @@ export interface Product {
     price: number;
     quantity: number;
     user_id: number;
+    category?: string;
 }

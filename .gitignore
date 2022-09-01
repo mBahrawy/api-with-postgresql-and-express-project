@@ -1,4 +1,5 @@
 build
 node_modules
-**/edited-images/**
-**/placeholders/**
+.env.test
+.env.production
+.env.development

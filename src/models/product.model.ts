@@ -16,7 +16,7 @@ export class ProductsModel {
     async index(): Promise<ProductsResponse> {
         try {
             const conn = await databaseClient.connect();
-            const sql = `SELECT id, name, price, quantity, user_id FROM products`;
+            const sql = `SELECT * FROM products`;
             const result = await conn.query(sql);
             conn.release();
 
@@ -41,7 +41,7 @@ export class ProductsModel {
 
     async show(id: string): Promise<ProductResponse> {
         try {
-            const sql = `SELECT id, name, price, quantity, user_id FROM products WHERE id=($1)`;
+            const sql = `SELECT * FROM products WHERE id=($1)`;
             const conn = await databaseClient.connect();
             const result = await conn.query(sql, [id]);
             conn.release();
@@ -67,9 +67,9 @@ export class ProductsModel {
 
     async create(p: Product, userID: number): Promise<ProductResponse> {
         try {
-            const sql = `INSERT INTO products (name, price, quantity, user_id) VALUES($1, $2, $3, $4) RETURNING *`;
+            const sql = `INSERT INTO products (name, price, quantity, user_id, category) VALUES($1, $2, $3, $4, $5) RETURNING *`;
             const conn = await databaseClient.connect();
-            const result = await conn.query(sql, [p.name, p.price, p.quantity, userID]);
+            const result = await conn.query(sql, [p.name, p.price, p.quantity, userID, p.category]);
             const product = result.rows[0];
             conn.release();
             delete product.password_digist;

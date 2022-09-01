@@ -10,12 +10,7 @@ const validateTokenMiddleware = (req: Request, res: Response, next: NextFunction
         error: "Not authorized action"
     };
 
-    if (!req.headers.authorization) {
-        res.status(notAuthErrorResponse.status).json(notAuthErrorResponse);
-        return;
-    }
-
-    if (!jwt.isValidToken(req.headers.authorization)) {
+    if (!req.headers.authorization || !jwt.isValidToken(req.headers.authorization)) {
         res.status(notAuthErrorResponse.status).json(notAuthErrorResponse);
         return;
     }

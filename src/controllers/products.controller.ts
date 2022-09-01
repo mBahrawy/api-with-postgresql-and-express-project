@@ -53,6 +53,7 @@ export class ProductsController {
                 name: req.body.name,
                 price: req.body.price,
                 quantity: req.body.quantity,
+                category: req.body.category,
                 user_id: this.jwt.decodedToken(token).user.id as number
             };
 
