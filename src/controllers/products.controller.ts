@@ -17,7 +17,7 @@ export class ProductsController {
 
     private _nullValuesResponse: ErrorResponse = {
         error: "Some inputs are required, please check them and try again.",
-        status: 400
+        status: 422
     };
 
     public index = async (req: Request, res: Response) => {
@@ -52,7 +52,7 @@ export class ProductsController {
             const product: Product = {
                 name: req.body.name,
                 price: req.body.price,
-                quantity: req.body.quantity,
+                stock: req.body.stock,
                 category: req.body.category,
                 user_id: this.jwt.decodedToken(token).user.id as number
             };

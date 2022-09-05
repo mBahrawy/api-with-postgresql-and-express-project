@@ -24,16 +24,16 @@ export class UsersModel {
             const result = await conn.query(sql);
             conn.release();
 
-            if (!result.rows.length) {
-                return {
-                    status: 404,
-                    error: "No users were found"
-                };
-            }
+            // if (!result.rows.length) {
+            //     return {
+            //         status: 204,
+            //         users: []
+            //     };
+            // }
 
             return {
                 status: 200,
-                users: result.rows
+                users: result.rows ?? []
             };
         } catch (err) {
             throw {

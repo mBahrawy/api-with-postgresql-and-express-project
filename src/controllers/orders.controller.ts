@@ -1,13 +1,15 @@
 import { Service } from "typedi";
 import { Request, Response } from "express";
-import { UsersModel } from "../models/user.model";
-import { User } from "../interfaces/User";
-import { DatabaseError } from "./../interfaces/responses/DatabaseError";
+import { Product } from "../interfaces/Product";
+import { JWT } from "../services/jwt.service";
 import { ErrorResponse } from "../interfaces/responses/ErrorResponse";
+import { DatabaseError } from "../interfaces/responses/DatabaseError";
+import { OrdersModel } from "../models/order.modal";
+import { Order } from "./../interfaces/Order";
 
 @Service()
-export class UsersController {
-    constructor(private _usersModel: UsersModel) {}
+export class OrdersController {
+    constructor(private _ordersModel: OrdersModel, private jwt: JWT) {}
 
     private _serverErrorResponse = {
         error: "Something went wrong, please try later",
@@ -19,15 +21,10 @@ export class UsersController {
         status: 422
     };
 
-    private _dublicatedValuesResponse: ErrorResponse = {
-        error: "Username/Email is already exsists in databse.",
-        status: 400
-    };
-
     public index = async (req: Request, res: Response) => {
         try {
-            const usersRes = await this._usersModel.index();
-            res.status(usersRes.status).json(usersRes);
+            const orderRespose = await this._ordersModel.index();
+            res.status(orderRespose.status).json(orderRespose);
         } catch (err: unknown) {
             const databseError = err as DatabaseError;
             console.log(databseError);
@@ -37,8 +34,8 @@ export class UsersController {
 
     public show = async (req: Request, res: Response) => {
         try {
-            const userRes = await this._usersModel.show(req.params.id);
-            res.status(userRes.status).json(userRes);
+            const ordersResponse = await this._ordersModel.show(req.params.id);
+            res.status(ordersResponse.status).json(ordersResponse);
         } catch (err: unknown) {
             const databseError = err as DatabaseError;
             console.log(databseError);
@@ -48,41 +45,30 @@ export class UsersController {
 
     public create = async (req: Request, res: Response) => {
         try {
-            const user: User = {
-                name: req.body.name,
-                username: req.body.username,
-                email: req.body.email,
-                password: req.body.password,
-                role: req.body.role
+            const token = req.headers.authorization;
+            if (!token) throw new Error("Can't create order, check auth");
+
+            const userId = this.jwt.decodedToken(token).user.id as number;
+
+            const order: Order = {
+                status: req.body.status,
+                total: Number(req.body.total) || 0,
+                user_id: userId
             };
 
-            const newUserRes = await this._usersModel.create(user);
-            res.status(newUserRes.status).json(newUserRes);
+            const newOrderResponse = await this._ordersModel.create(order);
+            res.status(newOrderResponse.status).json(newOrderResponse);
         } catch (err: unknown) {
             const databseError = err as DatabaseError;
             console.log(databseError);
+
             switch (databseError.sqlError.code) {
                 case "23502": // not_null_violation
                     res.status(this._nullValuesResponse.status).json(this._nullValuesResponse);
-                    break;
-                case "23505": // unique_violation
-                    res.status(this._dublicatedValuesResponse.status).json(this._dublicatedValuesResponse);
                     break;
                 default:
                     res.status(this._serverErrorResponse.status).json(this._serverErrorResponse);
             }
         }
     };
-
-    public destroy = async (req: Request, res: Response) => {
-        try {
-            const deletedUserRes = await this._usersModel.delete(req.params.id);
-            res.status(deletedUserRes.status).json(deletedUserRes);
-        } catch (err: unknown) {
-            const databseError = err as DatabaseError;
-            console.log(databseError);
-            res.status(this._serverErrorResponse.status).json(this._serverErrorResponse);
-        }
-    };
 }
- 

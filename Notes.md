@@ -26,6 +26,17 @@
 - adding a foreign key:
     `ALTER TABLE users ADD FOREIGN KEY (order_id) REFERENCES order(id);`    
 
+- sorting
+    `SELECT * FROM products ORDER BY price DESC`;
+- add column to table:
+    `alter table user `
+    `add column phone_number bigint;`
+
+- add join query:
+    `SELECT * FROM products INNER JOIN order_products ON product.id = order_products.id`
+    `SELECT * FROM order_products INNER JOIN products ON order_products.product_id = products.id`
+    
+
 ## psql meta commands     
 - connect to database:
     `\c my_new_databse`

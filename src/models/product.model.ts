@@ -20,16 +20,16 @@ export class ProductsModel {
             const result = await conn.query(sql);
             conn.release();
 
-            if (!result.rows.length) {
-                return {
-                    status: 404,
-                    error: "No products were found"
-                };
-            }
+            // if (!result.rows.length) {
+            //     return {
+            //         status: 204,
+            //         products: []
+            //     };
+            // }
 
             return {
                 status: 200,
-                products: result.rows
+                products: result.rows ?? []
             };
         } catch (err) {
             throw {
@@ -67,9 +67,9 @@ export class ProductsModel {
 
     async create(p: Product, userID: number): Promise<ProductResponse> {
         try {
-            const sql = `INSERT INTO products (name, price, quantity, user_id, category) VALUES($1, $2, $3, $4, $5) RETURNING *`;
+            const sql = `INSERT INTO products (name, price, stock, user_id, category) VALUES($1, $2, $3, $4, $5) RETURNING *`;
             const conn = await databaseClient.connect();
-            const result = await conn.query(sql, [p.name, p.price, p.quantity, userID, p.category]);
+            const result = await conn.query(sql, [p.name, p.price, p.stock, userID, p.category]);
             const product = result.rows[0];
             conn.release();
             delete product.password_digist;

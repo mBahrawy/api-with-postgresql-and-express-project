@@ -3,6 +3,7 @@ import usersRouteHandler from "./api/users-route.handler";
 import logger from "../services/logging.service";
 import loginRouteHandler from "./api/login-route.handler";
 import productsRouteHandler from "./api/products-route.handler";
+import ordersRouteHandler from "./api/orders-route.handler";
 
 const routes: Router = express.Router();
 
@@ -18,6 +19,7 @@ routes.get("/", logger, (req: Request, res: Response) => {
 });
 
 productsRouteHandler(routes);
+ordersRouteHandler(routes);
 usersRouteHandler(routes);
 loginRouteHandler(routes);
 
