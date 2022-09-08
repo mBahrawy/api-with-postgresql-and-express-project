@@ -9,10 +9,12 @@ const { index, show, create } = Container.get(OrdersController);
 const { addProduct } = Container.get(OrdersService);
 
 const ordersRouteHandler = (router: express.Router) => {
-    router.get("/orders", [validateTokenMiddleware, validateRoleMiddleware.bind(this, ["admin"])], index);
+    // User
     router.get("/orders/:id", [validateTokenMiddleware], show);
     router.put("/orders/:id/products", [validateTokenMiddleware], addProduct);
     router.post("/orders", [validateTokenMiddleware], create);
+    // Admin
+    router.get("/orders", [validateTokenMiddleware, validateRoleMiddleware.bind(this, ["admin"])], index);
 };
 
 export default ordersRouteHandler;

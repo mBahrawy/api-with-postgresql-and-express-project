@@ -1,7 +1,7 @@
 import express, { Request, Response, Router } from "express";
 import usersRouteHandler from "./api/users-route.handler";
 import logger from "../services/logging.service";
-import loginRouteHandler from "./api/login-route.handler";
+import authRouteHandler from "./api/auth-route.handler";
 import productsRouteHandler from "./api/products-route.handler";
 import ordersRouteHandler from "./api/orders-route.handler";
 import categoriesRouteHandler from "./api/categories-route.handler";
@@ -23,7 +23,7 @@ categoriesRouteHandler(routes);
 productsRouteHandler(routes);
 ordersRouteHandler(routes);
 usersRouteHandler(routes);
-loginRouteHandler(routes);
+authRouteHandler(routes);
 
 // Backedend routes
 routes.get("*", logger, (req: Request, res: Response) => {

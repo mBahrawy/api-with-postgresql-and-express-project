@@ -24,13 +24,6 @@ export class UsersModel {
             const result = await conn.query(sql);
             conn.release();
 
-            // if (!result.rows.length) {
-            //     return {
-            //         status: 204,
-            //         users: []
-            //     };
-            // }
-
             return {
                 status: 200,
                 users: result.rows ?? []
@@ -71,10 +64,11 @@ export class UsersModel {
 
     async create(u: User): Promise<UserResponse> {
         try {
-            const sql = `INSERT INTO users (name, username, email, role, password_digist) VALUES($1, $2, $3, $4, $5) RETURNING *`;
+            // eslint-disable-next-line max-len
+            const sql = `INSERT INTO users (firstname, lastname, username, email, role, password_digist) VALUES($1, $2, $3, $4, $5, $6) RETURNING *`;
             const conn = await databaseClient.connect();
             const hashedPassword = bcrypt.hashSync(u.password + pepper, parseInt(saltRounds));
-            const result = await conn.query(sql, [u.name, u.username, u.email, u.role, hashedPassword]);
+            const result = await conn.query(sql, [u.firstname, u.lastname, u.username, u.email, u.role, hashedPassword]);
             const user = result.rows[0];
             conn.release();
             delete user.password_digist;

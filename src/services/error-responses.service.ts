@@ -3,6 +3,12 @@ import { ErrorResponse } from "../interfaces/responses/ErrorResponse";
 
 @Service()
 export class ErrorResponsesService {
+    public invalidUserRole(msg = "You don't have a valid user role"): ErrorResponse {
+        return {
+            error: msg,
+            status: 403
+        };
+    }
     public doesntExsistsError(msg = "Data doenst exsists."): ErrorResponse {
         return {
             error: msg,

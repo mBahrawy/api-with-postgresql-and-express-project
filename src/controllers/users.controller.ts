@@ -1,32 +1,16 @@
 import { Service } from "typedi";
 import { Request, Response } from "express";
 import { UsersModel } from "../models/user.model";
-import { User, USER_ROLES_ARR } from "../interfaces/User";
+import { User, userRole, USER_ROLES_ARR } from "../interfaces/User";
 import { DatabaseError } from "./../interfaces/responses/DatabaseError";
 import { ErrorResponse } from "../interfaces/responses/ErrorResponse";
+import { ErrorResponsesService } from "../services/error-responses.service";
+
+type params = [userRole, Request, Response];
 
 @Service()
 export class UsersController {
-    constructor(private _usersModel: UsersModel) {}
-
-    private _serverErrorResponse = {
-        error: "Something went wrong, please try later",
-        status: 500
-    };
-
-    private _nullValuesResponse: ErrorResponse = {
-        error: "Some inputs are required, please check them and try again.",
-        status: 422
-    };
-
-    private _dublicatedValuesResponse: ErrorResponse = {
-        error: "Username/Email is already exsists in databse.",
-        status: 400
-    };
-    private _unknownUserRoleResponse: ErrorResponse = {
-        error: "Please enter a valid user role",
-        status: 400
-    };
+    constructor(private _usersModel: UsersModel, private _errorResponseService: ErrorResponsesService) {}
 
     public index = async (req: Request, res: Response) => {
         try {
@@ -35,7 +19,7 @@ export class UsersController {
         } catch (err: unknown) {
             const databseError = err as DatabaseError;
             console.log(databseError);
-            res.status(this._serverErrorResponse.status).json(this._serverErrorResponse);
+            res.status(this._errorResponseService.serverError().status).json(this._errorResponseService.serverError());
         }
     };
 
@@ -46,24 +30,21 @@ export class UsersController {
         } catch (err: unknown) {
             const databseError = err as DatabaseError;
             console.log(databseError);
-            res.status(this._serverErrorResponse.status).json(this._serverErrorResponse);
+            res.status(this._errorResponseService.serverError().status).json(this._errorResponseService.serverError());
         }
     };
 
-    public create = async (req: Request, res: Response) => {
+    public create = async (...params: params) => {
+        const [role, req, res] = params;
+
         try {
-
-            if (!USER_ROLES_ARR.includes(req.body.role)) {
-                res.status(this._unknownUserRoleResponse.status).json(this._unknownUserRoleResponse);
-                return;
-            }
-
             const user: User = {
-                name: req.body.name,
                 username: req.body.username,
+                firstname: req.body.firstname,
+                lastname: req.body.lastname,
                 email: req.body.email,
                 password: req.body.password,
-                role: req.body.role
+                role: role
             };
 
             const newUserRes = await this._usersModel.create(user);
@@ -72,14 +53,20 @@ export class UsersController {
             const databseError = err as DatabaseError;
             console.log(databseError);
             switch (databseError.sqlError.code) {
-                case "23502": // not_null_violation
-                    res.status(this._nullValuesResponse.status).json(this._nullValuesResponse);
+                case "23502": {
+                    // not_null_violation
+                    const dbErr = this._errorResponseService.nullValues("Some inputs are required, please check them and try again.");
+                    res.status(dbErr.status).json(dbErr);
                     break;
-                case "23505": // unique_violation
-                    res.status(this._dublicatedValuesResponse.status).json(this._dublicatedValuesResponse);
+                }
+                case "23505": {
+                    // unique_violation
+                    const dbErr = this._errorResponseService.dublicatedValues("Username/Email is already exsists in databse.");
+                    res.status(dbErr.status).json(dbErr);
                     break;
+                }
                 default:
-                    res.status(this._serverErrorResponse.status).json(this._serverErrorResponse);
+                    res.status(this._errorResponseService.serverError().status).json(this._errorResponseService.serverError());
             }
         }
     };
@@ -91,7 +78,7 @@ export class UsersController {
         } catch (err: unknown) {
             const databseError = err as DatabaseError;
             console.log(databseError);
-            res.status(this._serverErrorResponse.status).json(this._serverErrorResponse);
+            res.status(this._errorResponseService.serverError().status).json(this._errorResponseService.serverError());
         }
     };
 }

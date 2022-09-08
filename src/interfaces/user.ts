@@ -10,8 +10,9 @@ export const USER_ROLES_ARR = [...Object.values(USER_ROLES_ENUM)];
 
 export interface User {
     id?: Number;
-    name: string;
     username: string;
+    firstname: string;
+    lastname: string;
     email: String;
     password?: String;
     token?: string;

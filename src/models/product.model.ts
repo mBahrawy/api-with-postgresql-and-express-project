@@ -33,6 +33,25 @@ export class ProductsModel {
             };
         }
     }
+    async getProductsByCategory(id: number): Promise<ProductsResponse> {
+        try {
+            const conn = await databaseClient.connect();
+            const sql = `SELECT * FROM products WHERE id=($1)`;
+            const result = await conn.query(sql, [id]);
+            conn.release();
+
+            return {
+                status: 200,
+                products: result.rows ?? []
+            };
+
+        } catch (err) {
+            throw {
+                message: "Could not get products.",
+                sqlError: err
+            };
+        }
+    }
 
     async show(id: string): Promise<ProductResponse> {
         try {
@@ -62,7 +81,6 @@ export class ProductsModel {
 
     async create(p: Product, userID: number): Promise<ProductResponse> {
         try {
-            
             const conn = await databaseClient.connect();
             const createProductSql = `INSERT INTO products (name, price, stock, user_id, category_id) VALUES($1, $2, $3, $4, $5) RETURNING *`;
             const resultProductResult = await conn.query(createProductSql, [p.name, p.price, p.stock, userID, p.category_id]);
