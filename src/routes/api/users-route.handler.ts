@@ -4,13 +4,14 @@ import { UsersController } from "../../controllers/users.controller";
 import validateTokenMiddleware from "../../middlewares/validate-token.middleware";
 import validateRoleMiddleware from "./../../middlewares/validate-role.middleware";
 
-const users = Container.get(UsersController);
+const { create, index, show, destroy } = Container.get(UsersController);
 
 const usersRouteHandler = (router: express.Router) => {
-    router.post("/create-user", users.create);
-    router.get("/all-users", [validateTokenMiddleware, validateRoleMiddleware.bind(this, ["admin"])], users.index);
-    router.get("/get-user/:id", [validateTokenMiddleware, validateRoleMiddleware.bind(this, ["admin"])], users.show);
-    router.delete("/delete-user/:id", [validateTokenMiddleware, validateRoleMiddleware.bind(this, ["admin"])], users.destroy);
+    router.post("/admins", create);
+    router.post("/users", [validateTokenMiddleware, validateRoleMiddleware.bind(this, ["admin"])], create);
+    router.get("/users", [validateTokenMiddleware, validateRoleMiddleware.bind(this, ["admin"])], index);
+    router.get("/users/:id", [validateTokenMiddleware, validateRoleMiddleware.bind(this, ["admin"])], show);
+    router.delete("/users/:id", [validateTokenMiddleware, validateRoleMiddleware.bind(this, ["admin"])], destroy);
 };
 
 export default usersRouteHandler;

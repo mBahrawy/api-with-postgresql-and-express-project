@@ -19,5 +19,6 @@
         "database": "store_front",
         "user": "root",
         "password": "root"
-    }
+    },
+    "sql-file" : true
 }

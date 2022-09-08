@@ -1,7 +1,7 @@
 import { Service } from "typedi";
 import { Request, Response } from "express";
 import { UsersModel } from "../models/user.model";
-import { User } from "../interfaces/User";
+import { User, USER_ROLES_ARR } from "../interfaces/User";
 import { DatabaseError } from "./../interfaces/responses/DatabaseError";
 import { ErrorResponse } from "../interfaces/responses/ErrorResponse";
 
@@ -21,6 +21,10 @@ export class UsersController {
 
     private _dublicatedValuesResponse: ErrorResponse = {
         error: "Username/Email is already exsists in databse.",
+        status: 400
+    };
+    private _unknownUserRoleResponse: ErrorResponse = {
+        error: "Please enter a valid user role",
         status: 400
     };
 
@@ -48,6 +52,12 @@ export class UsersController {
 
     public create = async (req: Request, res: Response) => {
         try {
+
+            if (!USER_ROLES_ARR.includes(req.body.role)) {
+                res.status(this._unknownUserRoleResponse.status).json(this._unknownUserRoleResponse);
+                return;
+            }
+
             const user: User = {
                 name: req.body.name,
                 username: req.body.username,
@@ -85,4 +95,3 @@ export class UsersController {
         }
     };
 }
- 

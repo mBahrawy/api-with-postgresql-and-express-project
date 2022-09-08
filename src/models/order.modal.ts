@@ -1,7 +1,6 @@
 import databaseClient from "../database";
 import { Service } from "typedi";
 import { ErrorResponse } from "../interfaces/responses/ErrorResponse";
-import { FeedbackResponse } from "../interfaces/responses/FeedbackResponse";
 import { Order, OrderItem } from "../interfaces/Order";
 import { Product } from "./../interfaces/Product";
 
@@ -17,20 +16,37 @@ export class OrdersModel {
     async index(): Promise<OrdersResponse> {
         try {
             const conn = await databaseClient.connect();
-            const sql = `SELECT * FROM orders`;
-            const result = await conn.query(sql);
-            conn.release();
 
-            // if (!result.rows.length) {
-            //     return {
-            //         status: 204,
-            //         orders: []
-            //     };
+            // get orders info
+            const ordersSql = `SELECT * FROM orders`;
+            const ordersResult = await conn.query(ordersSql);
+
+            // const orderIds = ordersResult.rows.map((row) => row.id);
+            // const relatedProductsArray: [Product[]] = [[]];
+
+            // products related to this order
+            // for (let i = 0; i < orderIds.length; i++) {
+            //     // eslint-disable-next-line max-len
+            //     const relatedProductsSql = `SELECT products.id, products.name, products.price, products.category_id, order_products.quantity FROM order_products INNER JOIN products ON order_products.product_id = products.id WHERE order_id=($1)`;
+
+            //     const relatedProductsResult: Product[] = (await conn.query(relatedProductsSql, [orderIds[i]])).rows;
+            //     relatedProductsArray.push(relatedProductsResult);
             // }
+
+            // const result = [
+            //     ...ordersResult.rows.map((order, index) => {
+            //         return {
+            //             ...order,
+            //             products: relatedProductsArray[index]
+            //         };
+            //     })
+            // ];
+
+            conn.release();
 
             return {
                 status: 200,
-                orders: result.rows ?? []
+                orders: ordersResult.rows
             };
         } catch (err) {
             throw {
@@ -41,7 +57,6 @@ export class OrdersModel {
     }
 
     async show(id: string): Promise<OrderResponse> {
-        let products: Product[] = [];
         try {
             const conn = await databaseClient.connect();
 
@@ -49,13 +64,10 @@ export class OrdersModel {
             const orderSql = `SELECT * FROM orders WHERE id=($1)`;
             const orderResult = await conn.query(orderSql, [id]);
 
-            console.log("orderResult", orderResult);
-
-            // products related to this order
-            const relatedProductsSql = `SELECT products.id, products.name, products.price, products.category, order_products.quantity FROM order_products INNER JOIN products ON order_products.product_id = products.id WHERE order_id=($1)`;
+            // products related to these orders
+            // eslint-disable-next-line max-len
+            const relatedProductsSql = `SELECT products.id, products.name, products.price, products.category_id, order_products.quantity FROM order_products INNER JOIN products ON order_products.product_id = products.id WHERE order_id=($1)`;
             const relatedProductsResult = await conn.query(relatedProductsSql, [id]);
-
-            console.log("relatedProductsResult", relatedProductsResult);
 
             // get each product info
 
@@ -82,14 +94,25 @@ export class OrdersModel {
 
     async create(o: Order): Promise<OrderResponse> {
         try {
-            const sql = `INSERT INTO orders (status, total, user_id) VALUES($1, $2, $3) RETURNING *`;
             const conn = await databaseClient.connect();
-            const result = await conn.query(sql, [o.status, o.total, o.user_id]);
-            const order = result.rows[0];
+            const createOrderSql = `INSERT INTO orders (status, total, user_id) VALUES($1, $2, $3) RETURNING *`;
+            const createOrderResult = await conn.query(createOrderSql, [o.status, o.total, o.user_id]);
+
+            if (o?.products) {
+                const productsInOrder: OrderItem[] = [...o.products];
+
+                for (let i = 0; o.products.length > i; i++) {
+                    await this.addProduct(productsInOrder[i].quantity, createOrderResult.rows[0].id, Number(productsInOrder[i].id));
+                }
+            }
+
             conn.release();
+
+            this.show(createOrderResult.rows[0].id);
+
             return {
                 status: 200,
-                order
+                order: (await this.show(createOrderResult.rows[0].id)).order
             };
         } catch (err) {
             throw {
@@ -99,7 +122,7 @@ export class OrdersModel {
         }
     }
 
-    async addProduct(quantity: number, order_id: string, product_id: string): Promise<OrderResponse> {
+    async addProduct(quantity: number, order_id: number, product_id: number): Promise<OrderResponse> {
         try {
             const conn = await databaseClient.connect();
 
@@ -118,6 +141,14 @@ export class OrdersModel {
             // Get current product price
             const productPriceSql = `SELECT price FROM products WHERE id=($1)`;
             const productPriceResult = await conn.query(productPriceSql, [product_id]);
+            
+            if (productPriceResult.rowCount === 0) {
+                throw {
+                    status: 404,
+                    error: `Some products don't exsists`
+                };
+            }
+
             const productPrice = productPriceResult.rows[0].price as number;
 
             // Update order total amount
@@ -128,7 +159,7 @@ export class OrdersModel {
             // Insert product to the order
             const orderProductsSql = `INSERT INTO order_products (quantity, order_id, product_id) VALUES($1, $2, $3) RETURNING *`;
 
-            const orderProductsResult = await conn.query(orderProductsSql, [quantity, order_id, product_id]);            
+            const orderProductsResult = await conn.query(orderProductsSql, [quantity, order_id, product_id]);
 
             conn.release();
             return {

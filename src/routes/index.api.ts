@@ -4,6 +4,7 @@ import logger from "../services/logging.service";
 import loginRouteHandler from "./api/login-route.handler";
 import productsRouteHandler from "./api/products-route.handler";
 import ordersRouteHandler from "./api/orders-route.handler";
+import categoriesRouteHandler from "./api/categories-route.handler";
 
 const routes: Router = express.Router();
 
@@ -18,6 +19,7 @@ routes.get("/", logger, (req: Request, res: Response) => {
     res.status(200).send(`<h2>Welcome to store front API</h2>`);
 });
 
+categoriesRouteHandler(routes);
 productsRouteHandler(routes);
 ordersRouteHandler(routes);
 usersRouteHandler(routes);

@@ -2,24 +2,14 @@ import { Service } from "typedi";
 import { Request, Response } from "express";
 import { Product } from "../interfaces/Product";
 import { JWT } from "../services/jwt.service";
-import { ErrorResponse } from "../interfaces/responses/ErrorResponse";
 import { DatabaseError } from "../interfaces/responses/DatabaseError";
 import { OrdersModel } from "../models/order.modal";
-import { Order } from "./../interfaces/Order";
+import { Order, OrderItem } from "./../interfaces/Order";
+import { ErrorResponsesService } from "../services/error-responses.service";
 
 @Service()
 export class OrdersController {
-    constructor(private _ordersModel: OrdersModel, private jwt: JWT) {}
-
-    private _serverErrorResponse = {
-        error: "Something went wrong, please try later",
-        status: 500
-    };
-
-    private _nullValuesResponse: ErrorResponse = {
-        error: "Some inputs are required, please check them and try again.",
-        status: 422
-    };
+    constructor(private _ordersModel: OrdersModel,  private _jwt: JWT, private _errorResponseService: ErrorResponsesService) {}
 
     public index = async (req: Request, res: Response) => {
         try {
@@ -28,7 +18,7 @@ export class OrdersController {
         } catch (err: unknown) {
             const databseError = err as DatabaseError;
             console.log(databseError);
-            res.status(this._serverErrorResponse.status).json(this._serverErrorResponse);
+            res.status(this._errorResponseService.serverError().status).json(this._errorResponseService.serverError());
         }
     };
 
@@ -39,7 +29,7 @@ export class OrdersController {
         } catch (err: unknown) {
             const databseError = err as DatabaseError;
             console.log(databseError);
-            res.status(this._serverErrorResponse.status).json(this._serverErrorResponse);
+            res.status(this._errorResponseService.serverError().status).json(this._errorResponseService.serverError());
         }
     };
 
@@ -48,11 +38,12 @@ export class OrdersController {
             const token = req.headers.authorization;
             if (!token) throw new Error("Can't create order, check auth");
 
-            const userId = this.jwt.decodedToken(token).user.id as number;
+            const userId = this._jwt.decodedToken(token).user.id as number;
 
             const order: Order = {
                 status: req.body.status,
-                total: Number(req.body.total) || 0,
+                total: 0,
+                products: req.body.products as OrderItem[],
                 user_id: userId
             };
 
@@ -64,10 +55,10 @@ export class OrdersController {
 
             switch (databseError.sqlError.code) {
                 case "23502": // not_null_violation
-                    res.status(this._nullValuesResponse.status).json(this._nullValuesResponse);
-                    break;
+                res.status(this._errorResponseService.nullValues().status).json(this._errorResponseService.nullValues());
+                break;
                 default:
-                    res.status(this._serverErrorResponse.status).json(this._serverErrorResponse);
+                    res.status(this._errorResponseService.nullValues().status).json(this._errorResponseService.nullValues());
             }
         }
     };

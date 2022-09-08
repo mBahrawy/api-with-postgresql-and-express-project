@@ -2,41 +2,39 @@ import databaseClient from "../database";
 import { Service } from "typedi";
 import { ErrorResponse } from "../interfaces/responses/ErrorResponse";
 import { FeedbackResponse } from "../interfaces/responses/FeedbackResponse";
-import { Product } from "../interfaces/Product";
+import { Category } from "../interfaces/Category";
 
-interface ProductsResponse extends ErrorResponse {
-    products?: Product[];
+interface CategoriesResponse extends ErrorResponse {
+    categories?: Category[];
 }
-interface ProductResponse extends ErrorResponse {
-    product?: Product;
+interface CategoryResponse extends ErrorResponse {
+    category?: Category;
 }
 
 @Service()
-export class ProductsModel {
-    async index(): Promise<ProductsResponse> {
+export class CategoriesModel {
+    async index(): Promise<CategoriesResponse> {
         try {
             const conn = await databaseClient.connect();
-            const sql = `SELECT * FROM products`;
+            const sql = `SELECT * FROM categories`;
             const result = await conn.query(sql);
             conn.release();
 
-
-
             return {
                 status: 200,
-                products: result.rows ?? []
+                categories: result.rows ?? []
             };
         } catch (err) {
             throw {
-                message: "Could not get products.",
+                message: "Could not get categories.",
                 sqlError: err
             };
         }
     }
 
-    async show(id: string): Promise<ProductResponse> {
+    async show(id: string): Promise<CategoryResponse> {
         try {
-            const sql = `SELECT * FROM products WHERE id=($1)`;
+            const sql = `SELECT * FROM categories WHERE id=($1)`;
             const conn = await databaseClient.connect();
             const result = await conn.query(sql, [id]);
             conn.release();
@@ -44,39 +42,36 @@ export class ProductsModel {
             if (!result.rowCount) {
                 return {
                     status: 404,
-                    error: "Product was not found"
+                    error: "Category was not found"
                 };
             }
 
             return {
                 status: 200,
-                product: result.rows[0]
+                category: result.rows[0]
             };
         } catch (err) {
             throw {
-                message: "Could not get product.",
+                message: "Could not get category.",
                 sqlError: err
             };
         }
     }
 
-    async create(p: Product, userID: number): Promise<ProductResponse> {
+    async create(c: Category): Promise<CategoryResponse> {
         try {
-            
+            const sql = `INSERT INTO categories (name, description) VALUES($1, $2) RETURNING *`;
             const conn = await databaseClient.connect();
-            const createProductSql = `INSERT INTO products (name, price, stock, user_id, category_id) VALUES($1, $2, $3, $4, $5) RETURNING *`;
-            const resultProductResult = await conn.query(createProductSql, [p.name, p.price, p.stock, userID, p.category_id]);
-            const product = resultProductResult.rows[0];
-            console.log(product);
-
+            const result = await conn.query(sql, [c.name, c.description]);
+            const category = result.rows[0];
             conn.release();
             return {
                 status: 200,
-                product
+                category
             };
         } catch (err) {
             throw {
-                message: "Could not create products.",
+                message: "Could not create categories.",
                 sqlError: err
             };
         }
@@ -84,7 +79,7 @@ export class ProductsModel {
 
     async delete(id: string): Promise<FeedbackResponse | ErrorResponse> {
         try {
-            const sql = `DELETE FROM products WHERE id=($1)`;
+            const sql = `DELETE FROM categories WHERE id=($1)`;
             const conn = await databaseClient.connect();
             const result = await conn.query(sql, [id]);
             conn.release();
@@ -92,17 +87,17 @@ export class ProductsModel {
             if (!result.rowCount) {
                 return {
                     status: 404,
-                    error: "Product was not found"
+                    error: "Category was not found"
                 };
             }
 
             return {
                 status: 200,
-                message: `Product with ID: ${id} was deleted`
+                message: `Category with ID: ${id} was deleted`
             };
         } catch (err) {
             throw {
-                message: "Could not delete products.",
+                message: "Could not delete categories.",
                 sqlError: err
             };
         }

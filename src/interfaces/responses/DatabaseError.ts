@@ -4,6 +4,7 @@ export interface DatabaseError {
 }
 
 export interface SqlError {
+    error?: string;
     length?: number;
     name?: string;
     severity?: string;
