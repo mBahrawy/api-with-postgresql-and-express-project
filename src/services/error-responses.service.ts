@@ -3,6 +3,12 @@ import { ErrorResponse } from "../interfaces/responses/ErrorResponse";
 
 @Service()
 export class ErrorResponsesService {
+    public createError(msg = "Somthing wrong happened", status = 400): ErrorResponse {
+        return {
+            error: msg,
+            status: status
+        };
+    }
     public invalidUserRole(msg = "You don't have a valid user role"): ErrorResponse {
         return {
             error: msg,

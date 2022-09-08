@@ -1,15 +1,39 @@
 import { Service } from "typedi";
-import { ErrorResponse } from "../interfaces/responses/ErrorResponse";
 import { OrdersModel } from "../models/order.modal";
-import { Order } from "../interfaces/Order";
 import { Request, Response } from "express";
 import { ErrorResponsesService } from "./error-responses.service";
-import { DatabaseError } from './../interfaces/responses/DatabaseError';
-
+import { DatabaseError } from "./../interfaces/responses/DatabaseError";
+import { Review } from "../interfaces/Review";
 
 @Service()
 export class OrdersService {
     constructor(private _ordersModel: OrdersModel, private _errorResponseService: ErrorResponsesService) {}
+
+    public completeOrder = async (req: Request, res: Response) => {
+        try {
+            const order_id = Number(req.params.id);
+            const rating = Number(req.body.service_rating);
+            if (!order_id || !rating) {
+                res.status(this._errorResponseService.nullValues().status).json(this._errorResponseService.nullValues());
+                return;
+            }
+
+            const review: Review = {
+                id: order_id,
+                service_rating: Number(req.body.service_rating),
+                ...(req.body.feedback ? { feedback: req.body.feedback } : { feedback: "" })
+            };
+
+            const completedOrderRes = await this._ordersModel.completeOrder(review);
+            res.status(completedOrderRes.status).json(completedOrderRes);
+        } catch (e) {
+            console.log(e);
+            const dbErr = e as DatabaseError;
+            // TODO modfy
+            const err = this._errorResponseService.createError(`${dbErr.message} ${dbErr.sqlError.error}`, 444);
+            res.status(err.status).json(err);
+        }
+    };
 
     public addProduct = async (req: Request, res: Response) => {
         try {
@@ -27,7 +51,8 @@ export class OrdersService {
         } catch (e: unknown) {
             const dbErr = e as DatabaseError;
             console.log(e);
-            const err = this._errorResponseService.doesntExsistsError(`${dbErr.message} ${dbErr.sqlError.error}`);
+            // TODO modfy
+            const err = this._errorResponseService.createError(`${dbErr.message} ${dbErr.sqlError.error}`, 444);
             res.status(err.status).json(err);
         }
     };

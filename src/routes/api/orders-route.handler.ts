@@ -7,12 +7,14 @@ import { OrdersService } from "../../services/orders.service";
 
 const { index, show, create } = Container.get(OrdersController);
 const { addProduct } = Container.get(OrdersService);
+const { completeOrder } = Container.get(OrdersService);
 
 const ordersRouteHandler = (router: express.Router) => {
     // User
     router.get("/orders/:id", [validateTokenMiddleware], show);
     router.put("/orders/:id/products", [validateTokenMiddleware], addProduct);
     router.post("/orders", [validateTokenMiddleware], create);
+    router.put("/orders/:id/complete", completeOrder);
     // Admin
     router.get("/orders", [validateTokenMiddleware, validateRoleMiddleware.bind(this, ["admin"])], index);
 };

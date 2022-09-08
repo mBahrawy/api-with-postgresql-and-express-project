@@ -3,6 +3,7 @@ import { Service } from "typedi";
 import { ErrorResponse } from "../interfaces/responses/ErrorResponse";
 import { Order, OrderItem } from "../interfaces/Order";
 import { Product } from "./../interfaces/Product";
+import { Review } from "./../interfaces/Review";
 
 interface OrdersResponse extends ErrorResponse {
     orders?: Order[];
@@ -69,7 +70,14 @@ export class OrdersModel {
             const relatedProductsSql = `SELECT products.id, products.name, products.price, products.category_id, order_products.quantity FROM order_products INNER JOIN products ON order_products.product_id = products.id WHERE order_id=($1)`;
             const relatedProductsResult = await conn.query(relatedProductsSql, [id]);
 
-            // get each product info
+            let relatedReview: Review | null = null;
+            if (orderResult.rows[0].status === "completed") {
+                // get related review
+                // eslint-disable-next-line max-len
+                const relatedReviewSql = `SELECT  * FROM reviews WHERE id=($1)`;
+                const relatedReviewResult = await conn.query(relatedReviewSql, [id]);
+                relatedReview = relatedReviewResult.rows[0];
+            }
 
             conn.release();
 
@@ -82,7 +90,11 @@ export class OrdersModel {
 
             return {
                 status: 200,
-                order: { ...orderResult.rows[0], products: relatedProductsResult.rows }
+                order: {
+                    ...orderResult.rows[0],
+                    products: relatedProductsResult.rows,
+                    review: relatedReview
+                }
             };
         } catch (err) {
             throw {
@@ -141,7 +153,7 @@ export class OrdersModel {
             // Get current product price
             const productPriceSql = `SELECT price FROM products WHERE id=($1)`;
             const productPriceResult = await conn.query(productPriceSql, [product_id]);
-            
+
             if (productPriceResult.rowCount === 0) {
                 throw {
                     status: 404,
@@ -167,8 +179,53 @@ export class OrdersModel {
                 order: updateOrderTotalResult.rows[0]
             };
         } catch (err) {
+            // TODO check err instance from and do coditions
             throw {
                 message: "Could not add product to order.",
+                sqlError: err
+            };
+        }
+    }
+
+    async completeOrder(r: Review): Promise<OrderResponse> {
+        try {
+            const conn = await databaseClient.connect();
+
+            // Check if there order is open befor adding item
+            const orderSql = `SELECT * FROM orders WHERE id=($1)`;
+            const orderResult = await conn.query(orderSql, [r.id]);
+            const order = orderResult.rows[0] as Order;
+
+            if (order.status !== "open") {
+                throw {
+                    status: 422,
+                    error: `Could not complete order ${r.id} because order status is ${order.status}`
+                };
+            }
+
+            if (orderResult.rowCount === 0) {
+                throw {
+                    status: 404,
+                    error: `Order doesn't exsists`
+                };
+            }
+
+            // Saving review
+            const addingReviewSql = `INSERT INTO reviews ( service_rating, feedback) VALUES($1, $2) RETURNING *`;
+            const addingReviewResult = await conn.query(addingReviewSql, [r.service_rating, r.feedback]);
+
+            // Update order status
+            const updateOrderStatusSql = `UPDATE orders SET status=($1) WHERE id=($2) RETURNING *`;
+            const updateOrderStatusResult = await conn.query(updateOrderStatusSql, ["completed", r.id]);
+
+            conn.release();
+            return {
+                status: 200,
+                order: updateOrderStatusResult.rows[0]
+            };
+        } catch (err) {
+            throw {
+                message: "Could not modify the order.",
                 sqlError: err
             };
         }
