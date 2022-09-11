@@ -9,7 +9,7 @@ import { ErrorResponsesService } from "../services/error-responses.service";
 
 @Service()
 export class OrdersController {
-    constructor(private _ordersModel: OrdersModel,  private _jwt: JWT, private _errorResponseService: ErrorResponsesService) {}
+    constructor(private _ordersModel: OrdersModel, private _jwt: JWT, private _errorResponseService: ErrorResponsesService) {}
 
     public index = async (req: Request, res: Response) => {
         try {
@@ -49,17 +49,16 @@ export class OrdersController {
 
             const newOrderResponse = await this._ordersModel.create(order);
             res.status(newOrderResponse.status).json(newOrderResponse);
-        } catch (err: unknown) {
-            const databseError = err as DatabaseError;
-            console.log(databseError);
-
-            switch (databseError.sqlError.code) {
-                case "23502": // not_null_violation
+        } catch (err: any) {
+            // Databse error - not_null_violation
+            if (err.code === "23502") {
                 res.status(this._errorResponseService.nullValues().status).json(this._errorResponseService.nullValues());
-                break;
-                default:
-                    res.status(this._errorResponseService.nullValues().status).json(this._errorResponseService.nullValues());
+                return;
             }
+
+            // Backend error
+            const backendError = this._errorResponseService.createError(err.error, err.status);
+            res.status(err.status).json(backendError);
         }
     };
 }

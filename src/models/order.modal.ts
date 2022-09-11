@@ -127,10 +127,8 @@ export class OrdersModel {
                 order: (await this.show(createOrderResult.rows[0].id)).order
             };
         } catch (err) {
-            throw {
-                message: "Could not create order.",
-                sqlError: err
-            };
+            console.log(err);
+            throw err;
         }
     }
 
@@ -157,7 +155,7 @@ export class OrdersModel {
             if (productPriceResult.rowCount === 0) {
                 throw {
                     status: 404,
-                    error: `Some products don't exsists`
+                    error: `A product doesnt't exsist`
                 };
             }
 
@@ -171,7 +169,7 @@ export class OrdersModel {
             // Insert product to the order
             const orderProductsSql = `INSERT INTO order_products (quantity, order_id, product_id) VALUES($1, $2, $3) RETURNING *`;
 
-            const orderProductsResult = await conn.query(orderProductsSql, [quantity, order_id, product_id]);
+            await conn.query(orderProductsSql, [quantity, order_id, product_id]);
 
             conn.release();
             return {
@@ -179,11 +177,9 @@ export class OrdersModel {
                 order: updateOrderTotalResult.rows[0]
             };
         } catch (err) {
-            // TODO check err instance from and do coditions
-            throw {
-                message: "Could not add product to order.",
-                sqlError: err
-            };
+            console.log(err);
+            throw err;
+        
         }
     }
 

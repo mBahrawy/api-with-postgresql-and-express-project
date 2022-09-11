@@ -2,7 +2,6 @@ import { Service } from "typedi";
 import { OrdersModel } from "../models/order.modal";
 import { Request, Response } from "express";
 import { ErrorResponsesService } from "./error-responses.service";
-import { DatabaseError } from "./../interfaces/responses/DatabaseError";
 import { Review } from "../interfaces/Review";
 
 @Service()
@@ -26,12 +25,17 @@ export class OrdersService {
 
             const completedOrderRes = await this._ordersModel.completeOrder(review);
             res.status(completedOrderRes.status).json(completedOrderRes);
-        } catch (e) {
-            console.log(e);
-            const dbErr = e as DatabaseError;
-            // TODO modfy
-            const err = this._errorResponseService.createError(`${dbErr.message} ${dbErr.sqlError.error}`, 444);
-            res.status(err.status).json(err);
+
+        } catch (err: any) {
+            // Databse error - not_null_violation
+            if (err.code === "23502") {
+                res.status(this._errorResponseService.nullValues().status).json(this._errorResponseService.nullValues());
+                return;
+            }
+
+            // Backend error
+            const backendError = this._errorResponseService.createError(err.error, err.status);
+            res.status(err.status).json(backendError);
         }
     };
 
@@ -48,12 +52,17 @@ export class OrdersService {
 
             const addedItemResponse = await this._ordersModel.addProduct(quantity, order_id, product_id);
             res.status(addedItemResponse.status).json(addedItemResponse);
-        } catch (e: unknown) {
-            const dbErr = e as DatabaseError;
-            console.log(e);
-            // TODO modfy
-            const err = this._errorResponseService.createError(`${dbErr.message} ${dbErr.sqlError.error}`, 444);
-            res.status(err.status).json(err);
+
+        } catch (err: any) {
+            // Databse error - not_null_violation
+            if (err.code === "23502") {
+                res.status(this._errorResponseService.nullValues().status).json(this._errorResponseService.nullValues());
+                return;
+            }
+
+            // Backend error
+            const backendError = this._errorResponseService.createError(err.error, err.status);
+            res.status(err.status).json(backendError);
         }
     };
 }

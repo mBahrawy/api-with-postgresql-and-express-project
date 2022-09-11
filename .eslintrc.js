@@ -19,7 +19,7 @@ module.exports = {
         "no-console": 1,
         "prefer-const": 1,
         "max-len": [1, { code: 140, ignoreComments: true }],
-        "@typescript-eslint/no-explicit-any": 2,
+        "@typescript-eslint/no-explicit-any": 1,
         "no-var": 2
     }
 };

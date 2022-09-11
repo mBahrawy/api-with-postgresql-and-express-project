@@ -15,7 +15,7 @@ export class ErrorResponsesService {
             status: 403
         };
     }
-    public doesntExsistsError(msg = "Data doenst exsists."): ErrorResponse {
+    public valueDoesntExsistsError(msg = "Data doenst exsists."): ErrorResponse {
         return {
             error: msg,
             status: 404

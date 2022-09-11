@@ -19,11 +19,16 @@ export class ProductsService {
 
             const productsByCategoryResponse = await this._productsModel.getProductsByCategory(category_id);
             res.status(productsByCategoryResponse.status).json(productsByCategoryResponse);
-        } catch (e: unknown) {
-            const dbErr = e as DatabaseError;
-            console.log(e);
-            const err = this._errorResponseService.doesntExsistsError(`${dbErr.message} ${dbErr.sqlError.error}`);
-            res.status(err.status).json(err);
+        } catch (err: any) {
+            // Databse error - not_null_violation
+            if (err.code === "23502") {
+                res.status(this._errorResponseService.nullValues().status).json(this._errorResponseService.nullValues());
+                return;
+            }
+
+            // Backend error
+            const backendError = this._errorResponseService.createError(err.error, err.status);
+            res.status(err.status).json(backendError);
         }
     };
 }
