@@ -37,17 +37,17 @@ export class ProductsController {
             const token = req.headers.authorization;
             if (!token) throw new Error("Can't create product, check auth");
 
-            const userId = this._jwt.decodedToken(token).user.id as number;
+            const user_id = this._jwt.decodedToken(token).user.id as number;
 
             const product: Product = {
                 name: req.body.name,
                 price: req.body.price,
                 stock: req.body.stock,
                 ...(Number(req.body.category_id) && { category_id: Number(req.body.category_id) }),
-                user_id: this._jwt.decodedToken(token).user.id as number
+                user_id
             };
 
-            const newProductRes = await this._productsModel.create(product, userId);
+            const newProductRes = await this._productsModel.create(product);
             res.status(newProductRes.status).json(newProductRes);
         } catch (err: unknown) {
             const databseError = err as DatabaseError;
@@ -65,7 +65,7 @@ export class ProductsController {
 
     public destroy = async (req: Request, res: Response) => {
         try {
-            const deletedProductRes = await this._productsModel.delete(req.params.id);
+            const deletedProductRes = await this._productsModel.destroy(req.params.id);
             res.status(deletedProductRes.status).json(deletedProductRes);
         } catch (err: unknown) {
             const databseError = err as DatabaseError;

@@ -66,7 +66,7 @@ export class CategoriesModel {
             const category = result.rows[0];
             conn.release();
             return {
-                status: 200,
+                status: 201,
                 category
             };
         } catch (err) {

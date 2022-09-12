@@ -22,32 +22,41 @@ export class OrdersModel {
             const ordersSql = `SELECT * FROM orders`;
             const ordersResult = await conn.query(ordersSql);
 
-            // const orderIds = ordersResult.rows.map((row) => row.id);
-            // const relatedProductsArray: [Product[]] = [[]];
+            const orderIds = ordersResult.rows.map((row) => row.id);
+            const relatedProductsArray: [Product[]] = [[]];
 
             // products related to this order
-            // for (let i = 0; i < orderIds.length; i++) {
-            //     // eslint-disable-next-line max-len
-            //     const relatedProductsSql = `SELECT products.id, products.name, products.price, products.category_id, order_products.quantity FROM order_products INNER JOIN products ON order_products.product_id = products.id WHERE order_id=($1)`;
+            let relatedReviews: Review[] = [];
 
-            //     const relatedProductsResult: Product[] = (await conn.query(relatedProductsSql, [orderIds[i]])).rows;
-            //     relatedProductsArray.push(relatedProductsResult);
-            // }
+            for (let i = 0; i < orderIds.length; i++) {
+                // eslint-disable-next-line max-len
+                const relatedProductsSql = `SELECT products.id, products.name, products.price, products.category_id, order_products.quantity FROM order_products INNER JOIN products ON order_products.product_id = products.id WHERE order_id=($1)`;
 
-            // const result = [
-            //     ...ordersResult.rows.map((order, index) => {
-            //         return {
-            //             ...order,
-            //             products: relatedProductsArray[index]
-            //         };
-            //     })
-            // ];
+                const relatedProductsResult: Product[] = (await conn.query(relatedProductsSql, [orderIds[i]])).rows;
+                relatedProductsArray.push(relatedProductsResult);
+
+                // get related review
+                // eslint-disable-next-line max-len
+                const relatedReviewSql = `SELECT  service_rating, feedback FROM reviews WHERE id=($1)`;
+                const relatedReviewResult = await conn.query(relatedReviewSql, [orderIds[i]]);
+                relatedReviews.push(relatedReviewResult.rows[0] || null);
+            }
+
+            const result = [
+                ...ordersResult.rows.map((order, index) => {
+                    return {
+                        ...order,
+                        products: relatedProductsArray[index],
+                        review: relatedReviews[index] || null
+                    };
+                })
+            ];
 
             conn.release();
 
             return {
                 status: 200,
-                orders: ordersResult.rows
+                orders: result
             };
         } catch (err) {
             throw {
@@ -74,10 +83,12 @@ export class OrdersModel {
             if (orderResult.rows[0].status === "completed") {
                 // get related review
                 // eslint-disable-next-line max-len
-                const relatedReviewSql = `SELECT  * FROM reviews WHERE id=($1)`;
+                const relatedReviewSql = `SELECT  service_rating, feedback FROM reviews WHERE id=($1)`;
                 const relatedReviewResult = await conn.query(relatedReviewSql, [id]);
                 relatedReview = relatedReviewResult.rows[0];
             }
+
+            // TODO check reviews
 
             conn.release();
 
@@ -123,7 +134,7 @@ export class OrdersModel {
             this.show(createOrderResult.rows[0].id);
 
             return {
-                status: 200,
+                status: 201,
                 order: (await this.show(createOrderResult.rows[0].id)).order
             };
         } catch (err) {
@@ -179,7 +190,6 @@ export class OrdersModel {
         } catch (err) {
             console.log(err);
             throw err;
-        
         }
     }
 
@@ -192,13 +202,6 @@ export class OrdersModel {
             const orderResult = await conn.query(orderSql, [r.id]);
             const order = orderResult.rows[0] as Order;
 
-            if (order.status !== "open") {
-                throw {
-                    status: 422,
-                    error: `Could not complete order ${r.id} because order status is ${order.status}`
-                };
-            }
-
             if (orderResult.rowCount === 0) {
                 throw {
                     status: 404,
@@ -206,13 +209,20 @@ export class OrdersModel {
                 };
             }
 
+            if (order.status !== "open") {
+                throw {
+                    status: 422,
+                    error: `Could not complete order ${order.id} because order status is ${order.status}`
+                };
+            }
+
             // Saving review
-            const addingReviewSql = `INSERT INTO reviews ( service_rating, feedback) VALUES($1, $2) RETURNING *`;
-            const addingReviewResult = await conn.query(addingReviewSql, [r.service_rating, r.feedback]);
+            const addingReviewSql = `INSERT INTO reviews (id, service_rating, feedback) VALUES($1, $2, $3) RETURNING *`;
+            const addingReviewResult = await conn.query(addingReviewSql, [order.id, r.service_rating, r.feedback]);
 
             // Update order status
             const updateOrderStatusSql = `UPDATE orders SET status=($1) WHERE id=($2) RETURNING *`;
-            const updateOrderStatusResult = await conn.query(updateOrderStatusSql, ["completed", r.id]);
+            const updateOrderStatusResult = await conn.query(updateOrderStatusSql, ["completed", order.id]);
 
             conn.release();
             return {

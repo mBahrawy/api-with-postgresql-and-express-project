@@ -73,7 +73,7 @@ export class UsersModel {
             conn.release();
             delete user.password_digist;
             return {
-                status: 200,
+                status: 201,
                 user
             };
         } catch (err) {

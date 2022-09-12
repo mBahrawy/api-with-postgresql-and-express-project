@@ -10,9 +10,9 @@ import * as dotenv from "dotenv";
 global.__basedir = __dirname;
 
 // eslint-disable-next-line no-console
-console.log(`App started in ${process.env.NODE_ENV} mode`);
+process.env.NODE_ENV ? console.log(`App started in ${process.env.NODE_ENV} mode`) : console.log("Error, Undefined app mode");
 
-dotenv.config({ path: `.env.${process.env.NODE_ENV}`});
+dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
 
 const PORT = process.env.APP_BACKEND_PORT || 3000;
 
@@ -36,7 +36,7 @@ app.use("/", routes);
 // start express server
 app.listen(PORT, () => {
     // eslint-disable-next-line no-console
-    console.log(`Server is starting at prot:${PORT}`);
+    console.log(`Server is starting at port: ${PORT}`);
 });
 
 export default app;

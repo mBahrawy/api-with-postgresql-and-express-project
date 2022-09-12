@@ -20,8 +20,6 @@ export class ProductsModel {
             const result = await conn.query(sql);
             conn.release();
 
-
-
             return {
                 status: 200,
                 products: result.rows ?? []
@@ -44,7 +42,6 @@ export class ProductsModel {
                 status: 200,
                 products: result.rows ?? []
             };
-
         } catch (err) {
             throw {
                 message: "Could not get products.",
@@ -79,17 +76,18 @@ export class ProductsModel {
         }
     }
 
-    async create(p: Product, userID: number): Promise<ProductResponse> {
+    async create(p: Product): Promise<ProductResponse> {
         try {
             const conn = await databaseClient.connect();
+            // eslint-disable-next-line max-len
             const createProductSql = `INSERT INTO products (name, price, stock, user_id, category_id) VALUES($1, $2, $3, $4, $5) RETURNING *`;
-            const resultProductResult = await conn.query(createProductSql, [p.name, p.price, p.stock, userID, p.category_id]);
+            const resultProductResult = await conn.query(createProductSql, [p.name, p.price, p.stock, p.user_id, p.category_id]);
             const product = resultProductResult.rows[0];
             console.log(product);
 
             conn.release();
             return {
-                status: 200,
+                status: 201,
                 product
             };
         } catch (err) {
@@ -100,7 +98,7 @@ export class ProductsModel {
         }
     }
 
-    async delete(id: string): Promise<FeedbackResponse | ErrorResponse> {
+    async destroy(id: string): Promise<FeedbackResponse | ErrorResponse> {
         try {
             const sql = `DELETE FROM products WHERE id=($1)`;
             const conn = await databaseClient.connect();

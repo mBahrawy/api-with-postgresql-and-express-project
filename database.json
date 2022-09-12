@@ -9,7 +9,7 @@
     "development": {
         "driver": "pg",
         "host": "127.0.0.1",
-        "database": "store_front",
+        "database": "store_front_dev",
         "user": "root",
         "password": "root"
     },
