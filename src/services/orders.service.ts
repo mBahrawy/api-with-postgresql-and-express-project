@@ -1,15 +1,17 @@
-import { Service } from "typedi";
-import { OrdersModel } from "../models/order.modal";
+import Container, { Service } from "typedi";
 import { Request, Response } from "express";
 import { ErrorResponsesService } from "./error-responses.service";
 import { Review } from "../interfaces/Review";
+import { OrderManagmnetModel } from "../models/order-managment.model";
 
 @Service()
 export class OrdersService {
-    constructor(private _ordersModel: OrdersModel, private _errorResponseService: ErrorResponsesService) {}
+    constructor(private _errorResponseService: ErrorResponsesService) {}
 
     public completeOrder = async (req: Request, res: Response) => {
         try {
+            const { completeOrder } = Container.get(OrderManagmnetModel);
+
             const order_id = Number(req.params.id);
             const rating = Number(req.body.service_rating);
             if (!order_id || !rating) {
@@ -23,12 +25,13 @@ export class OrdersService {
                 ...(req.body.feedback ? { feedback: req.body.feedback } : { feedback: "" })
             };
 
-            const completedOrderRes = await this._ordersModel.completeOrder(review);
+            const completedOrderRes = await completeOrder(review);
             res.status(completedOrderRes.status).json(completedOrderRes);
-
         } catch (err: any) {
-            // Databse error - not_null_violation
-            if (err.code === "23502") {
+            console.log(err);
+
+            if (err?.sqlError?.code === "23502") {
+                // Databse error - not_null_violation
                 res.status(this._errorResponseService.nullValues().status).json(this._errorResponseService.nullValues());
                 return;
             }
@@ -41,6 +44,7 @@ export class OrdersService {
 
     public addProduct = async (req: Request, res: Response) => {
         try {
+            const { addProduct } = Container.get(OrderManagmnetModel);
             const order_id = Number(req.params.id);
             const product_id = Number(req.body.product_id);
             const quantity = Number(req.body.quantity);
@@ -50,12 +54,13 @@ export class OrdersService {
                 return;
             }
 
-            const addedItemResponse = await this._ordersModel.addProduct(quantity, order_id, product_id);
+            const addedItemResponse = await addProduct(quantity, order_id, product_id);
             res.status(addedItemResponse.status).json(addedItemResponse);
-
         } catch (err: any) {
-            // Databse error - not_null_violation
-            if (err.code === "23502") {
+            console.log(err);
+
+            if (err?.sqlError?.code === "23502") {
+                // Databse error - not_null_violation
                 res.status(this._errorResponseService.nullValues().status).json(this._errorResponseService.nullValues());
                 return;
             }

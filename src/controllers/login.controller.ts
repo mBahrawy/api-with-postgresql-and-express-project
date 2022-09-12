@@ -14,11 +14,10 @@ export const loginController = async (req: Request, res: Response) => {
         const auth = Container.get(AuthService);
         const loginResponse: LoginResponse = await auth.login(req.body.username, req.body.password);
         res.status(loginResponse.status).json(loginResponse);
-    } catch (err: unknown) {
-        const databaseError = err as DatabaseError;
+    } catch (err: any) {
         const errorResponse: ErrorResponse = {
             status: 500,
-            error: databaseError.message
+            error: err.message
         };
         res.status(errorResponse.status).json(errorResponse);
     }

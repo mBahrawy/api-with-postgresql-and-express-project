@@ -1,12 +1,11 @@
 import { Service } from "typedi";
 import { Request, Response } from "express";
 import { ErrorResponsesService } from "./error-responses.service";
-import { DatabaseError } from "../interfaces/responses/DatabaseError";
-import { ProductsModel } from "../models/product.model";
+import { ProductManagmentModel } from "../models/product-managment.model.ts";
 
 @Service()
 export class ProductsService {
-    constructor(private _productsModel: ProductsModel, private _errorResponseService: ErrorResponsesService) {}
+    constructor(private _productManagmentModel: ProductManagmentModel, private _errorResponseService: ErrorResponsesService) {}
 
     public productsByCategory = async (req: Request, res: Response) => {
         try {
@@ -17,11 +16,13 @@ export class ProductsService {
                 return;
             }
 
-            const productsByCategoryResponse = await this._productsModel.getProductsByCategory(category_id);
+            const productsByCategoryResponse = await this._productManagmentModel.getProductsByCategory(`${category_id}`);
             res.status(productsByCategoryResponse.status).json(productsByCategoryResponse);
         } catch (err: any) {
-            // Databse error - not_null_violation
-            if (err.code === "23502") {
+            console.log(err);
+
+            if (err?.sqlError?.code === "23502") {
+                // Databse error - not_null_violation
                 res.status(this._errorResponseService.nullValues().status).json(this._errorResponseService.nullValues());
                 return;
             }

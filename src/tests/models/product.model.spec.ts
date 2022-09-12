@@ -1,70 +1,94 @@
-import supertest from "supertest";
-import app from "../../server";
 import { describe } from "test";
 import { Product } from "../../interfaces/Product";
 import { ProductsModel } from "../../models/product.model";
 import { UsersModel } from "./../../models/user.model";
-import { Container } from "typedi";
-import { HttpService } from "./../../services/http.service";
+import { CategoriesModel } from "./../../models/category.model";
 import { User } from "../../interfaces/User";
-import { AxiosResponse } from "axios";
+import { Category } from "./../../interfaces/Category";
 
 const productsModel = new ProductsModel();
 const usersModal = new UsersModel();
-const { postRequest } = Container.get(HttpService);
-
-const request: supertest.SuperTest<supertest.Test> = supertest(app);
+const categoriesModel = new CategoriesModel();
 
 describe("Product modal", () => {
-    const { index, show, create, destroy, getProductsByCategory } = productsModel;
+    const { index, show, create, destroy } = productsModel;
 
-    beforeAll(() => {
-        (async (): Promise<void> => {
-            const createAdminResponse: AxiosResponse = await postRequest(
-                "/register/admin",
-                {
-                    firstname: "admin",
-                    lastname: "admin",
-                    username: "admin",
-                    email: "admin@admin.com",
-                    password: "admin"
-                },
-                {}
-            );
-            const createUserResponse: AxiosResponse = await postRequest(
-                "/register",
-                {
-                    firstname: "user",
-                    lastname: "user",
-                    username: "user",
-                    email: "user@user.com",
-                    password: "user"
-                },
-                {}
-            );
-        })();
+    beforeAll(async (): Promise<void> => {
+        try {
+            const user: User = {
+                firstname: "admin",
+                lastname: "admin",
+                username: "admin3",
+                email: "admin3@admin.com",
+                password: "admin",
+                role: "admin"
+            };
+
+            const category: Category = {
+                name: "Test category",
+                description: "bla bla bla"
+            };
+
+            await usersModal.create(user);
+            await categoriesModel.create(category);
+        } catch (e) {
+            console.log(e);
+        }
     });
 
-    it("should have index products method", () => expect(index).toBeDefined());
-    it("should have show product method", () => expect(show).toBeDefined());
-    it("should have create product method", () => expect(create).toBeDefined());
-    it("should have delete product method", () => expect(destroy).toBeDefined());
-    it("should have get products by categories method", () => expect(getProductsByCategory).toBeDefined());
-
-    it("should create a product", async () => {
-        const user_id = 1;
-        const category_id = null;
-
-        const product: Product = {
-            name: "Macbook",
-            price: 3000,
-            stock: 20,
-            user_id,
-            category_id
-        };
-
-        const result = await create(product);
-        expect(result.status).toEqual(201);
+    describe("Check product model method exists", () => {
+        it("should have index products method", () => expect(index).toBeDefined());
+        it("should have show product method", () => expect(show).toBeDefined());
+        it("should have create product method", () => expect(create).toBeDefined());
+        it("should have delete product method", () => expect(destroy).toBeDefined());
+        // it("should have get products by categories method", () => expect(getProductsByCategory).toBeDefined());
     });
 
+    describe("Test product model methods functionality", () => {
+
+
+        it("should create a product", async () => {
+            const user_id = 1;
+            const category_id = null;
+
+            const product: Product = {
+                name: "Dummy product for product model test",
+                price: 3000,
+                stock: 20,
+                user_id,
+                category_id
+            };
+
+            const result = await create(product);
+            expect(result.status).toEqual(201);
+        });
+
+        it("should get a products with id=1", async () => {
+            const result = await show("1");
+            expect(result.status).toEqual(200);
+        });
+
+        it("should get all products", async () => {
+            const result = await index();
+            expect(result.status).toEqual(200);
+        });
+
+        it("should delete a product", async () => {
+            // Create a product to be deleted
+            const product: Product = {
+                name: "Dummy product for product model test, test delete method",
+                price: 3000,
+                stock: 20,
+                user_id: 1
+            };
+
+            const productResponse = await productsModel.create(product);
+            const product_id = productResponse.product?.id;
+
+            // Appley delete
+            const result = await destroy(`${product_id}`);
+            expect(result.status).toEqual(200);
+        });
+
+    });
 });

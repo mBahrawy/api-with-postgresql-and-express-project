@@ -42,6 +42,7 @@ export class AuthService {
                 status: 200
             };
         } catch (err) {
+            console.log(err);
             throw {
                 status: 500,
                 message: "Error happened during auth.",

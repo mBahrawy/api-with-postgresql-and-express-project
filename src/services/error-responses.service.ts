@@ -9,7 +9,13 @@ export class ErrorResponsesService {
             status: status
         };
     }
-    public invalidUserRole(msg = "You don't have a valid user role"): ErrorResponse {
+    public entityRelationError(msg = "This entity is related to another entity in database."): ErrorResponse {
+        return {
+            error: msg,
+            status: 403
+        };
+    }
+    public invalidUserRole(msg = "You don't have a valid user role."): ErrorResponse {
         return {
             error: msg,
             status: 403

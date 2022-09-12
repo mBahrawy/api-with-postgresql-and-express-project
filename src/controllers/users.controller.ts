@@ -1,9 +1,7 @@
 import { Service } from "typedi";
 import { Request, Response } from "express";
 import { UsersModel } from "../models/user.model";
-import { User, userRole, USER_ROLES_ARR } from "../interfaces/User";
-import { DatabaseError } from "./../interfaces/responses/DatabaseError";
-import { ErrorResponse } from "../interfaces/responses/ErrorResponse";
+import { User, userRole } from "../interfaces/User";
 import { ErrorResponsesService } from "../services/error-responses.service";
 
 type params = [userRole, Request, Response];
@@ -16,9 +14,8 @@ export class UsersController {
         try {
             const usersRes = await this._usersModel.index();
             res.status(usersRes.status).json(usersRes);
-        } catch (err: unknown) {
-            const databseError = err as DatabaseError;
-            console.log(databseError);
+        } catch (err: any) {
+            console.log(err);
             res.status(this._errorResponseService.serverError().status).json(this._errorResponseService.serverError());
         }
     };
@@ -27,9 +24,8 @@ export class UsersController {
         try {
             const userRes = await this._usersModel.show(req.params.id);
             res.status(userRes.status).json(userRes);
-        } catch (err: unknown) {
-            const databseError = err as DatabaseError;
-            console.log(databseError);
+        } catch (err: any) {
+            console.log(err);
             res.status(this._errorResponseService.serverError().status).json(this._errorResponseService.serverError());
         }
     };
@@ -49,25 +45,23 @@ export class UsersController {
 
             const newUserRes = await this._usersModel.create(user);
             res.status(newUserRes.status).json(newUserRes);
-        } catch (err: unknown) {
-            const databseError = err as DatabaseError;
-            console.log(databseError);
-            switch (databseError.sqlError.code) {
-                case "23502": {
-                    // not_null_violation
-                    const dbErr = this._errorResponseService.nullValues("Some inputs are required, please check them and try again.");
-                    res.status(dbErr.status).json(dbErr);
-                    break;
-                }
-                case "23505": {
-                    // unique_violation
-                    const dbErr = this._errorResponseService.dublicatedValues("Username/Email is already exsists in databse.");
-                    res.status(dbErr.status).json(dbErr);
-                    break;
-                }
-                default:
-                    res.status(this._errorResponseService.serverError().status).json(this._errorResponseService.serverError());
+        } catch (err: any) {
+            console.log(err);
+
+            if (err?.sqlError?.code === "23502") {
+                // Databse error - not_null_violation
+                res.status(this._errorResponseService.nullValues().status).json(this._errorResponseService.nullValues());
+                return;
             }
+            if (err?.sqlError?.code === "23505") {
+                // Databse error - unique_violation
+                res.status(this._errorResponseService.dublicatedValues().status).json(this._errorResponseService.dublicatedValues());
+                return;
+            }
+
+            // Backend error
+            const backendError = this._errorResponseService.createError(err.error, err.status);
+            res.status(err.status).json(backendError);
         }
     };
 
@@ -75,9 +69,8 @@ export class UsersController {
         try {
             const deletedUserRes = await this._usersModel.delete(req.params.id);
             res.status(deletedUserRes.status).json(deletedUserRes);
-        } catch (err: unknown) {
-            const databseError = err as DatabaseError;
-            console.log(databseError);
+        } catch (err: any) {
+            console.log(err);
             res.status(this._errorResponseService.serverError().status).json(this._errorResponseService.serverError());
         }
     };

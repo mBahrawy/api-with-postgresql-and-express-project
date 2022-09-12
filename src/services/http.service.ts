@@ -14,4 +14,10 @@ export class HttpService {
     public postRequest = async (route: string, data: unknown, config: AxiosRequestConfig<unknown>): Promise<AxiosPromise> => {
         return await axios.post(`${this._baseUrl}${route}`, data, config);
     };
+    public deleteRequest = async (route: string, id: unknown, config: AxiosRequestConfig<unknown>): Promise<AxiosPromise> => {
+        return await axios.post(`${this._baseUrl}${route}`, id, config);
+    };
+    public putRequest = async (route: string, data: unknown, config: AxiosRequestConfig<unknown>): Promise<AxiosPromise> => {
+        return await axios.post(`${this._baseUrl}${route}`, data, config);
+    };
 }

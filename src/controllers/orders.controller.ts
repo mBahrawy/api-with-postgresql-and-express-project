@@ -1,8 +1,6 @@
 import { Service } from "typedi";
 import { Request, Response } from "express";
-import { Product } from "../interfaces/Product";
 import { JWT } from "../services/jwt.service";
-import { DatabaseError } from "../interfaces/responses/DatabaseError";
 import { OrdersModel } from "../models/order.modal";
 import { Order, OrderItem } from "./../interfaces/Order";
 import { ErrorResponsesService } from "../services/error-responses.service";
@@ -15,9 +13,8 @@ export class OrdersController {
         try {
             const orderRespose = await this._ordersModel.index();
             res.status(orderRespose.status).json(orderRespose);
-        } catch (err: unknown) {
-            const databseError = err as DatabaseError;
-            console.log(databseError);
+        } catch (err: any) {
+            console.log(err);
             res.status(this._errorResponseService.serverError().status).json(this._errorResponseService.serverError());
         }
     };
@@ -26,9 +23,8 @@ export class OrdersController {
         try {
             const ordersResponse = await this._ordersModel.show(req.params.id);
             res.status(ordersResponse.status).json(ordersResponse);
-        } catch (err: unknown) {
-            const databseError = err as DatabaseError;
-            console.log(databseError);
+        } catch (err: any) {
+            console.log(err);
             res.status(this._errorResponseService.serverError().status).json(this._errorResponseService.serverError());
         }
     };
@@ -41,7 +37,7 @@ export class OrdersController {
             const userId = this._jwt.decodedToken(token).user.id as number;
 
             const order: Order = {
-                status: req.body.status,
+                status: req.body.status || null,
                 total: 0,
                 products: req.body.products as OrderItem[],
                 user_id: userId
@@ -50,8 +46,9 @@ export class OrdersController {
             const newOrderResponse = await this._ordersModel.create(order);
             res.status(newOrderResponse.status).json(newOrderResponse);
         } catch (err: any) {
-            // Databse error - not_null_violation
-            if (err.code === "23502") {
+            console.log(err);
+            if (err?.sqlError?.code === "23502") {
+                // Databse error - not_null_violation
                 res.status(this._errorResponseService.nullValues().status).json(this._errorResponseService.nullValues());
                 return;
             }
