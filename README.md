@@ -12,7 +12,7 @@ First, open terminal inside project directory, and run these commands
 
 
 ## Download Postman API collection:
-- An exported file from Postman is (avaliable here)[https://drive.google.com/file/d/1wWgc6PAcKh6tE17ZeZduJUKldNPseLF3/view?usp=sharing]
+- An exported file from Postman is [avaliable here](https://drive.google.com/file/d/1wWgc6PAcKh6tE17ZeZduJUKldNPseLF3/view?usp=sharing)
 
 ## Preparing application environments:
 - `.env.development`
