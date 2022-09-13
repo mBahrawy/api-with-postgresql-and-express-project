@@ -1,13 +1,10 @@
 import { describe } from "test";
 import { Product } from "../../interfaces/Product";
 import { ProductsModel } from "../../models/product.model";
-import { UsersModel } from "./../../models/user.model";
 import { CategoriesModel } from "./../../models/category.model";
-import { User } from "../../interfaces/User";
 import { Category } from "./../../interfaces/Category";
 
 const productsModel = new ProductsModel();
-const usersModal = new UsersModel();
 const categoriesModel = new CategoriesModel();
 
 describe("Product modal", () => {
@@ -15,21 +12,11 @@ describe("Product modal", () => {
 
     beforeAll(async (): Promise<void> => {
         try {
-            const user: User = {
-                firstname: "admin",
-                lastname: "admin",
-                username: "admin3",
-                email: "admin3@admin.com",
-                password: "admin",
-                role: "admin"
-            };
-
             const category: Category = {
                 name: "Test category",
                 description: "bla bla bla"
             };
 
-            await usersModal.create(user);
             await categoriesModel.create(category);
         } catch (e) {
             console.log(e);
@@ -44,8 +31,6 @@ describe("Product modal", () => {
     });
 
     describe("Test product model methods functionality", () => {
-
-
         it("should create a product", async () => {
             const user_id = 1;
             const category_id = null;
@@ -88,6 +73,5 @@ describe("Product modal", () => {
             const result = await destroy(`${productId}`);
             expect(result.status).toEqual(200);
         });
-
     });
 });

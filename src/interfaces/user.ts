@@ -1,9 +1,8 @@
-export type userRole = "regular" | "admin" | "super_admin";
+export type userRole = "regular" | "admin";
 
 export enum USER_ROLES_ENUM {
     "regular",
-    "admin",
-    "super_admin"
+    "admin"
 }
 
 export const USER_ROLES_ARR = [...Object.values(USER_ROLES_ENUM)];

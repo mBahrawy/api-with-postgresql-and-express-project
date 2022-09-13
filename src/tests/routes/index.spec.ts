@@ -15,9 +15,3 @@ describe("Check app home page", () => {
         expect(response.status).toBe(404);
     });
 });
-
-// describe("dummy", () => {
-//     it("should test", async (): Promise<void> => {
-//         expect(2).toBe(2);
-//     });
-// });

@@ -1,33 +1,14 @@
 import { describe } from "test";
 import { Product } from "../../interfaces/Product";
-import { UsersModel } from "../../models/user.model";
-import { User } from "../../interfaces/User";
 import { OrdersModel } from "./../../models/order.modal";
 import { ProductsModel } from "../../models/product.model";
 import { Order } from "./../../interfaces/Order";
 
 const ordersModel = new OrdersModel();
-const usersModal = new UsersModel();
 const productsModel = new ProductsModel();
 
 describe("Order modal", () => {
     const { index, show, create } = ordersModel;
-
-    beforeAll(async (): Promise<void> => {
-        try {
-            const user: User = {
-                firstname: "admin",
-                lastname: "admin",
-                username: "admin2",
-                email: "admin2@admin.com",
-                password: "admin",
-                role: "admin"
-            };
-            await usersModal.create(user);
-        } catch (e) {
-            console.log(e);
-        }
-    });
 
     describe("Check order model method exists", () => {
         it("should have index orders method", () => expect(index).toBeDefined());

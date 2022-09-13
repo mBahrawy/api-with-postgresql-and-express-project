@@ -15,7 +15,7 @@ const validateRoleMiddleware = (...params: params) => {
         error: "You are not authorized, you must be an admin to do this action."
     };
 
-    const decodedUserRole: userRole = jwt.decodedToken(req.headers.authorization as string).user.role;
+    const decodedUserRole = jwt.decodedToken(req.headers.authorization as string).user.role as userRole;
 
     if (!rolesArr.includes(decodedUserRole)) {
         res.status(forbiddenErrorResponse.status).json(forbiddenErrorResponse);

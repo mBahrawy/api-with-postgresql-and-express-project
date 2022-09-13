@@ -1,12 +1,8 @@
 import { describe } from "test";
-import { Product } from "../../interfaces/Product";
-import { ProductsModel } from "../../models/product.model";
-import { Order } from "../../interfaces/Order";
 import { CategoriesModel } from "./../../models/category.model";
 import { Category } from "./../../interfaces/Category";
 
 const categoriesModel = new CategoriesModel();
-const productsModel = new ProductsModel();
 
 describe("Category modal", () => {
     const { index, show, create, destroy } = categoriesModel;

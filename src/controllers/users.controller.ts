@@ -1,10 +1,8 @@
 import { Service } from "typedi";
 import { Request, Response } from "express";
 import { UsersModel } from "../models/user.model";
-import { User, userRole } from "../interfaces/User";
+import { User } from "../interfaces/User";
 import { ErrorResponsesService } from "../services/error-responses.service";
-
-type params = [userRole, Request, Response];
 
 @Service()
 export class UsersController {
@@ -30,8 +28,7 @@ export class UsersController {
         }
     };
 
-    public create = async (...params: params) => {
-        const [role, req, res] = params;
+    public create = async (req: Request, res: Response) => {
 
         try {
             const user: User = {
@@ -40,7 +37,7 @@ export class UsersController {
                 lastname: req.body.lastname,
                 email: req.body.email,
                 password: req.body.password,
-                role: role
+                role: "regular"
             };
 
             const newUserRes = await this._usersModel.create(user);

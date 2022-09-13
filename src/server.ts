@@ -5,6 +5,8 @@ import routes from "./routes/index.api";
 import path from "path";
 import cors from "cors";
 import * as dotenv from "dotenv";
+import { Container } from "typedi";
+import { CreateAdmin } from "./services/create-admin.service";
 
 // Defining app base folder
 global.__basedir = __dirname;
@@ -38,5 +40,10 @@ app.listen(PORT, () => {
     // eslint-disable-next-line no-console
     console.log(`Server is starting at port: ${PORT}`);
 });
+
+
+// Creating admin
+const { createAdmin } = Container.get(CreateAdmin);
+createAdmin();
 
 export default app;
