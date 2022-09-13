@@ -12,30 +12,22 @@ export class OrdersService {
         try {
             const { completeOrder } = Container.get(OrderManagmnetModel);
 
-            const order_id = Number(req.params.id);
-            const rating = Number(req.body.service_rating);
-            if (!order_id || !rating) {
-                res.status(this._errorResponseService.nullValues().status).json(this._errorResponseService.nullValues());
-                return;
-            }
+            const id = Number(req.params.id) || Number(req.body.id);
+            const service_rating = Number(req.body.service_rating);
+            const feedback = req.body.feedback;
 
-            const review: Review = {
-                id: order_id,
-                service_rating: Number(req.body.service_rating),
-                ...(req.body.feedback ? { feedback: req.body.feedback } : { feedback: "" })
-            };
+            let review: Review | null = null;
+            id && service_rating && feedback && (review = { id, service_rating, feedback });
 
-            const completedOrderRes = await completeOrder(review);
+            const completedOrderRes = await completeOrder(id, review);
             res.status(completedOrderRes.status).json(completedOrderRes);
         } catch (err: any) {
             console.log(err);
-
             if (err?.sqlError?.code === "23502") {
                 // Databse error - not_null_violation
                 res.status(this._errorResponseService.nullValues().status).json(this._errorResponseService.nullValues());
                 return;
             }
-
             // Backend error
             const backendError = this._errorResponseService.createError(err.error, err.status);
             res.status(err.status).json(backendError);

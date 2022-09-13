@@ -4,6 +4,7 @@ import { ProductsModel } from "../../models/product.model";
 import { OrderManagmnetModel } from "../../models/order-managment.model";
 import { OrdersModel } from "./../../models/order.modal";
 import { Review } from "./../../interfaces/Review";
+import { Order } from "../../interfaces/Order";
 
 const orderManagmnetModel = new OrderManagmnetModel();
 const productsModel = new ProductsModel();
@@ -36,14 +37,32 @@ describe("Order modal", () => {
             expect(result.status).toEqual(200);
         });
 
-        it("should complete an order, set its status to completed", async () => {
-            const review: Review = {
-                id: 1,
-                service_rating: 2.5,
-                feedback: "good service."
+        it("should complete an order, set its status to completed, add a review", async () => {
+            const product: Product = {
+                name: "Dummy product for order model test",
+                price: 3000,
+                stock: 20,
+                user_id: 1
             };
 
-            const result = await completeOrder(review);
+            const productResponse = await productsModel.create(product);
+            const product_id = productResponse.product?.id as number;
+
+            const order: Order = {
+                status: "open",
+                products: [{ id: product_id, quantity: 2 }]
+            };
+
+            const orderResult = await orderModel.create(order);
+            const orderId = orderResult.order?.id as number;
+
+            const review: Review = {
+                id: orderId,
+                service_rating: 4.2,
+                feedback: "test feedback"
+            };
+
+            const result = await completeOrder(orderId, review);
             expect(result.status).toEqual(200);
         });
     });

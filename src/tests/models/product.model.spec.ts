@@ -41,7 +41,6 @@ describe("Product modal", () => {
         it("should have show product method", () => expect(show).toBeDefined());
         it("should have create product method", () => expect(create).toBeDefined());
         it("should have delete product method", () => expect(destroy).toBeDefined());
-        // it("should have get products by categories method", () => expect(getProductsByCategory).toBeDefined());
     });
 
     describe("Test product model methods functionality", () => {
@@ -83,10 +82,10 @@ describe("Product modal", () => {
             };
 
             const productResponse = await productsModel.create(product);
-            const product_id = productResponse.product?.id;
+            const productId = productResponse.product?.id;
 
             // Appley delete
-            const result = await destroy(`${product_id}`);
+            const result = await destroy(`${productId}`);
             expect(result.status).toEqual(200);
         });
 

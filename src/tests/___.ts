@@ -1,6 +1,6 @@
 import { AxiosResponse } from "axios";
 import { Container } from "typedi";
-import { HttpService } from "./../../services/http.service";
+import { HttpService } from "../services/http.service";
 const { postRequest } = Container.get(HttpService);
 
 (async (): Promise<void> => {
@@ -28,7 +28,6 @@ const { postRequest } = Container.get(HttpService);
     );
 })();
 
-
 const request: supertest.SuperTest<supertest.Test> = supertest(app);
 import supertest from "supertest";
-import app from "../../server";
+import app from "../server";

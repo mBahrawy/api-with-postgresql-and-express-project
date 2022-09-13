@@ -62,7 +62,7 @@ export class CategoriesController {
 
     public destroy = async (req: Request, res: Response) => {
         try {
-            const deletedProductRes = await this._categoriesModel.delete(req.params.id);
+            const deletedProductRes = await this._categoriesModel.destroy(req.params.id);
             res.status(deletedProductRes.status).json(deletedProductRes);
         } catch (err: any) {
             console.log(err);

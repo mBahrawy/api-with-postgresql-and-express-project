@@ -1,4 +1,5 @@
 import { DisplayProcessor, StacktraceOption } from "jasmine-spec-reporter";
+import { SpecReporter } from "jasmine-spec-reporter";
 import SuiteInfo = jasmine.SuiteInfo;
 
 class CustomProcessor extends DisplayProcessor {
@@ -7,9 +8,6 @@ class CustomProcessor extends DisplayProcessor {
     }
 }
 jasmine.getEnv().clearReporters();
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const SpecReporter = require("jasmine-spec-reporter").SpecReporter;
 jasmine.getEnv().addReporter(
     new SpecReporter({
         spec: {

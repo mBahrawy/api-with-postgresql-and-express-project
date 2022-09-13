@@ -25,6 +25,7 @@ export class CategoriesModel {
                 categories: result.rows ?? []
             };
         } catch (err) {
+            console.log(err);
             throw {
                 message: "Could not get categories.",
                 sqlError: err
@@ -51,6 +52,7 @@ export class CategoriesModel {
                 category: result.rows[0]
             };
         } catch (err) {
+            console.log(err);
             throw {
                 message: "Could not get category.",
                 sqlError: err
@@ -70,6 +72,7 @@ export class CategoriesModel {
                 category
             };
         } catch (err) {
+            console.log(err);
             throw {
                 message: "Could not create categories.",
                 sqlError: err
@@ -77,7 +80,7 @@ export class CategoriesModel {
         }
     }
 
-    async delete(id: string): Promise<FeedbackResponse | ErrorResponse> {
+    async destroy(id: string): Promise<FeedbackResponse | ErrorResponse> {
         try {
             const sql = `DELETE FROM categories WHERE id=($1)`;
             const conn = await databaseClient.connect();
@@ -96,6 +99,7 @@ export class CategoriesModel {
                 message: `Category with ID: ${id} was deleted`
             };
         } catch (err) {
+            console.log(err);
             throw {
                 message: "Could not delete categories.",
                 sqlError: err

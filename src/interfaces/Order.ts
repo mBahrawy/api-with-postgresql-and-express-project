@@ -1,4 +1,4 @@
-import { Product } from "./Product";
+import { Review } from "./Review";
 
 export interface Order {
     id?: number;
@@ -6,10 +6,11 @@ export interface Order {
     user_id?: number;
     status?: OrderStatus;
     total?: number;
-    products: OrderItem[];
+    products?: OrderItem[] | [];
+    review?: Review | null;
 }
 
-export type OrderStatus = "open" | "close";
+export type OrderStatus = "open" | "close" | "completed";
 
 export interface OrderItem {
     id?: number;

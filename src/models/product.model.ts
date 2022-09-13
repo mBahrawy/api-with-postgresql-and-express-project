@@ -51,6 +51,7 @@ export class ProductsModel {
                 product: result.rows[0]
             };
         } catch (err) {
+            console.log(err);
             throw {
                 message: "Could not get product.",
                 sqlError: err
@@ -71,6 +72,7 @@ export class ProductsModel {
                 product
             };
         } catch (err) {
+            console.log(err);
             throw {
                 message: "Could not create products.",
                 sqlError: err
@@ -97,6 +99,7 @@ export class ProductsModel {
                 message: `Product with ID: ${id} was deleted`
             };
         } catch (err) {
+            console.log(err);
             throw {
                 message: "Could not delete product.",
                 sqlError: err

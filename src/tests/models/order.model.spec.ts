@@ -46,11 +46,11 @@ describe("Order modal", () => {
 
             const productResponse = await productsModel.create(product);
 
-            const product_id = productResponse.product?.id;
+            const productId = productResponse.product?.id;
 
             const order: Order = {
                 status: "open",
-                products: [{ id: product_id, quantity: 2 }]
+                products: [{ id: productId, quantity: 2 }]
             };
             const result = await create(order);
             expect(result.status).toEqual(201);

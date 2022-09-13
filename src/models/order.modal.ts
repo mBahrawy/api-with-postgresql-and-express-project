@@ -60,6 +60,7 @@ export class OrdersModel {
                 orders: result
             };
         } catch (err) {
+            console.log(err);
             throw {
                 message: "Could not get orders.",
                 sqlError: err
@@ -109,6 +110,7 @@ export class OrdersModel {
                 }
             };
         } catch (err) {
+            console.log(err);
             throw {
                 message: "Could not get order.",
                 sqlError: err
@@ -141,6 +143,7 @@ export class OrdersModel {
                 order
             };
         } catch (err) {
+            console.log(err);
             throw {
                 message: "Could not create order.",
                 sqlError: err

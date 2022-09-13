@@ -22,6 +22,7 @@ export class ProductManagmentModel {
                 products: result.rows ?? []
             };
         } catch (err) {
+            console.log(err);
             throw {
                 message: "Could not get products.",
                 sqlError: err
