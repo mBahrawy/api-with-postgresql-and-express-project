@@ -21,27 +21,42 @@ First, open terminal inside project directory, and run these commands
 | 5432              | Postgres Database               | All env files      |
 
 ## Application API documentation:
+- Used Authentication type is `Bearer` by JWT plugin    
 
 ### Not authorized/public APIs:
-| Endpoint                                          | Method | Auth | Role    | Usage                                       |
-| ------------------------------------------------- | ------ | ---- | ------- | ------------------------------------------- |
-| `http://localhost:{{PORT}}/login`                 | POST   | No   |         | login user                                  |
-| `http://localhost:{{PORT}}/register`              | POST   | No   |         | create new user                             |
-| ------------------------------------------------- | ------ | ---- | ------- | ------------------------------------------- |
-| `http://localhost:{{PORT}}/products/:id`          | GET    | No   |         | Getting a single product with id            |
-| `http://localhost:{{PORT}}/products/category/:id` | GET    | No   |         | Getting all products related to category id |
-| `http://localhost:{{PORT}}/products`              | POST   | Yes  | Admin   | Will create a new product                   |
-| `http://localhost:{{PORT}}/products/:id`          | DELETE | Yes  | Admin   | Will delete a product with id               |
-| ------------------------------------------------- | ------ | ---- | ------- | ------------------------------------------- |
-
+| Endpoint                                          | Method | Auth | Role/Constrain           | Usage                                       | Body sample      |
+| ------------------------------------------------- | ------ | ---- | ------------------------ | ------------------------------------------- |----------------- |
+| `/login`                                          | POST   | No   |                          | login user, works with for all user roles | <code>{ &nbsp;"username": "user",&nbsp;"password": "user123"}</code>   |
+| `/register`                                       | POST   | No   |                          | create new user                             | <code>{<br><br>&nbsp;"firstname": "user",<br>&nbsp;"lastname": "user",<br>&nbsp;"username": "user",<br>&nbsp;"email": "user@user.com",<br>&nbsp;"password": "user123"<br>}</code> |
+| ----                                              | ----   | ---- | ----                     | ----                                        |                  |
+| `/products/:id`                                   | GET    | No   |                          | Getting a single product with product id            |                  |
+| `/products/category/:id`                          | GET    | No   |                          | Getting all products related to category id |                  |
+| `/products`                                       | POST   | Yes  | Admin only               | Will create a new product                   | <code>{<br><br>&nbsp;"name": "USB cable 3",<br>&nbsp;"price": 10,<br>&nbsp;"stock": 250<br>}</code> |
+| `/products/:id`                                   | DELETE | Yes  | Admin only               | Will delete a product with id               |                  |
+| ----                                              | ----   | ---- | ----                     | ----                                        |                  |
+| `/orders`                                         | GET    | Yes  | Admin only               | Getting all orders                          |                  |
+| `/orders/:id`                                     | GET    | Yes  | Admin<br> or order_owner | Get order details with                      |                  |
+| `/orders`                                         | POST   | Yes  | Any role                 | Create new order, Empty or with products    | <code>{<br><br>&nbsp;"status": "open",<br>&nbsp; "products": [<br>&nbsp; &nbsp;{ "id": 11, "quantity": 2 },<br>&nbsp; &nbsp;{ "id": 12, "quantity": 3 }<br>&nbsp;]<br>}</code> |
+| `/orders/:id/products`                            | PUT    | Yes  | Admin<br> or order_owner | Add a product to order, must be with status is 'open'    |                  |
+| `/orders/:id/complete`                            | PUT    | Yes  | order_owner only         | Change order status from 'open' to 'completed',<br> It must be an order with products and its previous status is 'opne', <br>User can add a 0-5 star rate and leave a text feedback.    | <code>{<br>&nbsp;"service_rating": 2.5,<br>&nbsp;"feedback": "good service."<br>}</code> |
+| ----                                              | ----   | ---- | ----                     | ----                                        |                  |
+| `/orders/categories`                              | GET    | NO   |                          | Getting all added categories    |  |
+| `/orders/categories/:d`                           | GET    | NO   |                          | Getting a single category information by category id    |  |
+| `/orders/categories`                              | POST   | Yes  | Admin only               | Will create a new category    | <code>{<br>&nbsp;"name": "Mobiles",<br>&nbsp;"description": "All about mobiles"<br>}</code> |
+| `/orders/categories/:d`                           | DELETE | Yes  | Admin only               | Will delete a category    |  |
+| ----                                              | ----   | ---- | ----                     | ----                                        |                  |
+| `/orders/reviews`                                 | GET    | Yes  | Admin only               | Get all reviews, please note that review id is the same crosponsind order id   |   |
+| `/orders/reviews/:id`                             | GET    | Yes  | Admin only               | Get a single review with order id   |   |
+| `/orders/reviews`                                 | POST   | Yes  | order_owner only         | Will leave a review for an order, It must be completed, have products, and wasn't  already reviwed    | <code>{<br><br>&nbsp;"id": 13,<br>&nbsp;"service_rating": 1.5,<br>&nbsp;"feedback": "good service."<br>}</code> |
+| ----                                              | ----   | ---- | ----                     | ----                                        |                  |
+| `/orders/users`                                   | GET    | Yes  | Admin only               | Get all users in databse   |   |
+| `/orders/users/:id`                               | GET    | Yes  | Admin only               | Get a single user with user id   |   |
+| `/orders/users/:id`                               | DELETE | Yes  | Admin only               | Delete a user with user id   |   |
 
 
 ## Download Postman API collection:
 
--   An exported file from Postman is [avaliable here](https://drive.google.com/file/d/1wWgc6PAcKh6tE17ZeZduJUKldNPseLF3/view?usp=sharing)
-
-
-
+-   An exported file from Postman is [avaliable here](https://drive.google.com/drive/folders/1SNfdUVb3rMMiqzdrqPD5ZS6Pw9FhDsp8?usp=sharing)
 
 ## Application environments:
 
@@ -159,7 +174,7 @@ Create `database.json` file in add directory
         "user": "root",
         "password": "root"
     },
-    "production": {
+        "production": {
         "driver": "pg",
         "host": "127.0.0.1",
         "database": "store_front",
@@ -247,3 +262,6 @@ Create `database.json` file in add directory
 | id              | integer   |        | PRI SERIAL KEY |
 | name            | varchar   | 255    | NOT NULL       |
 | run_on          | timestamp | 255    | NOT NULL       |
+
+## ERD Diagram
+![Store front app ERD](https://lh3.googleusercontent.com/fife/AAbDypA0rsoXhib4gDvwpTGqNC1Gi7gN6kiPz_ev8Cptvri1CgivLWRfoBlDz-Lbg_Z_QgPsCZ6hAE1Qj8NDVkSggogF_Bb-ynyEwFKfdUyDLt0YldlelHbyowXlTbptuRm8n-SDYJdyKYK785p84CQG3UTJJTsujRp8DJaGS5rOcetjRq96E1zkes9LFYI4_VBImL3N0QAP2q7Vbj461yiUg5viMd5WXEMeq-u9n8Sra-Q21jfK4qag51qdJ_8rHoB2gL1wKtRGLRBXSv-vXSMDfDFvyjRI5LJTphcWmZ71dd5NubSd5CrwN-gEOl_rXUH4nWuLhcpWqPsUObKkLAzIjdEaXhafmWGytkzN82uJ89PFoOvNVBtUw5KrDG148YUT1W2TZrTOdn5sQAhoLbzX6SWFbxEfwhZFgacmhyExeTvEo3FQyE6S5zcJM-RPpS0JDlqdz5FbKUxaNtTpyuOrPVojG_mrxOEBVUg4Jxb8DZNMRiNGNq7cY0WFUK8hOtRCynXKnkZotKIRHMvTzW6ZBgZMYVgYaf6dNHxsEVcDSZN4-ZueF9XlJ9-wQWkBmPsa3uDKKkx-xgf0gOSicH1mW6LWUU78svyaARP7mPbyU-8AGJa5pj1I_Udsj8TUVaOWaSVoXuJNd-k1qg1fxgEe_ibc18WKtd_8VDUYCgugrHgme0CoQu5syHLNjlp7h_NZ86nlkbHzGNpBBre4wsLGMSRf0z4m7Tkt6pBE5_UHtfqPa_I8KEAJsI60aeTSDFkNAz9eJpXwA0q1E_-pka5GT6YYXsegx-KITWRomMfdKo88aAC1Z7TGklm5yvwx8unzrZXDAsmoeJy8hlolMgG4Kwg8O-OL2yVkK6DG2iO0EwYUARbtggDUsClmEG-Ml0dJF63udhSITu7Ba2kO9F0mnEaICqowso3nilCUzhDg-cX6EMklqNu_V4eNr4_svgaF8wFDSmAHvuvfVNmkpD_sWEa5OB8G3yXV09osagOyqUhG-DfwKV5LTLruyKEOQAROQGmbep6LTLdjYjY_5J-peIi3EuQgruAb1xohApc1m2fzgvQ3SZHgUSp49Crz24Pz1dEOE-KJlCcL1g-vxLFvVEhGSJULjfkq-0CQZFQXGcVauQbUNH4sxWLDWJEMEO-T5AeG93mDYlnwFCNemy_EQNrNi9tXI8sY9YMpN2q6Br4e7DpwRT7r78goDVK3T5xESrzLiNM9UPCGv8yw69oLTCwfaeM20qosQQegc3iaCVemVyUC9wKQwZRUMP_n2DFeghsP1RhN9MXADZFjUYkScZLnNZJVVC8cNuy62E-jzSFa=w1203-h882)
