@@ -2,6 +2,10 @@
 
 This project for Udacity EgFwd Fullstack Nanodegree project
 
+## Download Postman API collection:
+
+-   An exported file from Postman is [avaliable here](https://drive.google.com/drive/folders/1SNfdUVb3rMMiqzdrqPD5ZS6Pw9FhDsp8?usp=sharing)
+
 ## How to run Image the Store front API project:
 
 First, open terminal inside project directory, and run these commands
@@ -54,9 +58,7 @@ First, open terminal inside project directory, and run these commands
 | `/orders/users/:id`                               | DELETE | Yes  | Admin only               | Delete a user with user id   |   |
 
 
-## Download Postman API collection:
 
--   An exported file from Postman is [avaliable here](https://drive.google.com/drive/folders/1SNfdUVb3rMMiqzdrqPD5ZS6Pw9FhDsp8?usp=sharing)
 
 ## Application environments:
 
