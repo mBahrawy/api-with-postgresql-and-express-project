@@ -12,23 +12,42 @@ First, open terminal inside project directory, and run these commands
 -   `npm run serve` for running the production version (through port will be 8000).
 -   `npm run test` for running implemneted unit tests (through port will be 6000).
 
-## Download Postman API collection:
-
--   An exported file from Postman is [avaliable here](https://drive.google.com/file/d/1wWgc6PAcKh6tE17ZeZduJUKldNPseLF3/view?usp=sharing)
-
-## Preparing application environments:
-
--   `.env.development`
--   `.env.production`
--   `.env.test`
-
-### Used ports:
+## Used ports:
 | Port              | Usage                           | Location           |
 | ----------------- | ------------------------------- | ------------------ |
 | 4000              | running app in development mode | `.env.development` |
 | 6000              | running app tests               | `.env.test`        |  
 | 8000              | running app in production mode  | `.env.production`  |
 | 5432              | Postgres Database               | All env files      |
+
+## Application API documentation:
+
+### Not authorized/public APIs:
+| Endpoint                                          | Method | Auth | Role    | Usage                                       |
+| ------------------------------------------------- | ------ | ---- | ------- | ------------------------------------------- |
+| `http://localhost:{{PORT}}/login`                 | POST   | No   |         | login user                                  |
+| `http://localhost:{{PORT}}/register`              | POST   | No   |         | create new user                             |
+| ------------------------------------------------- | ------ | ---- | ------- | ------------------------------------------- |
+| `http://localhost:{{PORT}}/products/:id`          | GET    | No   |         | Getting a single product with id            |
+| `http://localhost:{{PORT}}/products/category/:id` | GET    | No   |         | Getting all products related to category id |
+| `http://localhost:{{PORT}}/products`              | POST   | Yes  | Admin   | Will create a new product                   |
+| `http://localhost:{{PORT}}/products/:id`          | DELETE | Yes  | Admin   | Will delete a product with id               |
+| ------------------------------------------------- | ------ | ---- | ------- | ------------------------------------------- |
+
+
+
+## Download Postman API collection:
+
+-   An exported file from Postman is [avaliable here](https://drive.google.com/file/d/1wWgc6PAcKh6tE17ZeZduJUKldNPseLF3/view?usp=sharing)
+
+
+
+
+## Application environments:
+
+-   `.env.development`
+-   `.env.production`
+-   `.env.test`
 
 ### 1. For development
 
