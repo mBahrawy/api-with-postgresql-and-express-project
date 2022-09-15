@@ -1,10 +1,8 @@
 import { describe } from "test";
-import Container from "typedi";
 import { ProductManagmentModel } from "../../models/product-managment.model.ts";
 
+const { getProductsByCategory } = new ProductManagmentModel();
 describe("Product modal", () => {
-    const { getProductsByCategory } = Container.get(ProductManagmentModel);
-
     describe("Check product managmanet model method exists", () => {
         it("should have get products by categories method", () => expect(getProductsByCategory).toBeDefined());
     });

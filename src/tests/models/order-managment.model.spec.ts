@@ -7,14 +7,13 @@ import { Review } from "./../../interfaces/Review";
 import { Order } from "../../interfaces/Order";
 import { AuthService } from "./../../services/auth.service";
 import { User } from "../../interfaces/User";
-import Container from "typedi";
+
+const productsModel = new ProductsModel();
+const orderModel = new OrdersModel();
+const { addProduct, completeOrder } = new OrderManagmnetModel();
+const { register } = new AuthService();
 
 describe("Order modal", () => {
-    const productsModel = Container.get(ProductsModel);
-    const orderModel = Container.get(OrdersModel);
-    const { addProduct, completeOrder } = Container.get(OrderManagmnetModel);
-    const { register } = Container.get(AuthService);
-
     describe("Check order managment model method exists", () => {
         it("should have add product to order method", () => expect(addProduct).toBeDefined());
         it("should have complete order method", () => expect(completeOrder).toBeDefined());

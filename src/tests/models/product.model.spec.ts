@@ -3,11 +3,11 @@ import { Product } from "../../interfaces/Product";
 import { ProductsModel } from "../../models/product.model";
 import { CategoriesModel } from "./../../models/category.model";
 import { Category } from "./../../interfaces/Category";
-import Container from "typedi";
+
+const categoriesModel = new CategoriesModel();
+const { index, show, create, destroy } = new ProductsModel();
 
 describe("Product modal", () => {
-    const categoriesModel = Container.get(CategoriesModel);
-    const { index, show, create, destroy } = Container.get(ProductsModel);
 
     beforeAll(async (): Promise<void> => {
         try {

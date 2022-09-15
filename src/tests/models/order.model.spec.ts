@@ -1,16 +1,12 @@
 import { describe } from "test";
-import { Product } from "../../interfaces/Product";
 import { OrdersModel } from "./../../models/order.modal";
-import { ProductsModel } from "../../models/product.model";
-import { Order } from "./../../interfaces/Order";
 import { User } from "../../interfaces/User";
 import { AuthService } from "../../services/auth.service";
-import Container from "typedi";
+
+const { index, show, create } = new OrdersModel();
+const { register } = new AuthService();
 
 describe("Order modal", () => {
-    const { index, show, create } = Container.get(OrdersModel);
-    const { register } = Container.get(AuthService);
-
     describe("Check order model method exists", () => {
         it("should have index orders method", () => expect(index).toBeDefined());
         it("should have show order method", () => expect(show).toBeDefined());

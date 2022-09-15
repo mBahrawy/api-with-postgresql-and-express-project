@@ -1,10 +1,10 @@
 import { describe } from "test";
 import { CategoriesModel } from "./../../models/category.model";
 import { Category } from "./../../interfaces/Category";
-import Container from "typedi";
+
+const { index, show, create, destroy } = new CategoriesModel();
 
 describe("Category modal", () => {
-    const { index, show, create, destroy } = Container.get(CategoriesModel);
 
     describe("Check category model method exists", () => {
         it("should have index catrgories method", () => expect(index).toBeDefined());
@@ -15,6 +15,7 @@ describe("Category modal", () => {
 
     describe("Test category model methods functionality", () => {
         it("should create a category", async () => {
+
             const category: Category = {
                 name: "Dummy category",
                 description: "Dummy category for category model test"

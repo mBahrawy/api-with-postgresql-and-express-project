@@ -6,13 +6,13 @@ import { ProductsModel } from "../../models/product.model";
 import { ReviewsModel } from "../../models/review.modal";
 import { OrdersModel } from "./../../models/order.modal";
 import { OrderManagmnetModel } from "./../../models/order-managment.model";
-import Container from "typedi";
+
+const productsModel = new ProductsModel();
+const orderModel = new OrdersModel();
+const orderManagmnetModel = new OrderManagmnetModel();
+const { create, index, show } = new ReviewsModel();
 
 describe("Review modal", () => {
-    const productsModel = Container.get(ProductsModel);
-    const orderModel = Container.get(OrdersModel);
-    const orderManagmnetModel = Container.get(OrderManagmnetModel);
-    const { create, index, show } = Container.get(ReviewsModel);
 
     describe("Check review model method exists", () => {
         it("should have add review to a completed order method", () => expect(create).toBeDefined());
