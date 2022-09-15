@@ -27,7 +27,7 @@ First, open terminal inside project directory, and run these commands
 ## Users and roles
 | Role              | Description                           |
 | ----------------- | ------------------------------------- |
-| Admin             | An admminstrator for the for  the app, will be create once at the first time you start the app. You can change login info for the `.env` file. |
+| Admin             | An administrator user acccount for the app, It will be create once at the first time you start the app. You can change login info for the `.env` file. The info inside `.env` can be modifed once per app installation, or edit mamually inside database. |
 | Regular           | Normal user, or clint                 |  
 
 
@@ -47,7 +47,7 @@ First, open terminal inside project directory, and run these commands
 | ----                                              | ----   | ---- | ----                     | ----                                        |                  |
 | `/orders`                                         | GET    | Yes  | Admin only               | Getting all orders                          |                  |
 | `/orders/:id`                                     | GET    | Yes  | Admin<br> or order_owner | Get order details with                      |                  |
-| `/orders`                                         | POST   | Yes  | Any role                 | Create new order, Empty or with products    | <code>{<br><br>&nbsp;"status": "open",<br>&nbsp; "products": [<br>&nbsp; &nbsp;{ "id": 11, "quantity": 2 },<br>&nbsp; &nbsp;{ "id": 12, "quantity": 3 }<br>&nbsp;]<br>}</code> |
+| `/orders`                                         | POST   | Yes  | Any role                 | Create new order, Empty or with products    | <code>{<br>&nbsp; "products": [<br>&nbsp; &nbsp;{ "id": 11, "quantity": 2 },<br>&nbsp; &nbsp;{ "id": 12, "quantity": 3 }<br>&nbsp;]<br>}</code> |
 | `/orders/:id/products`                            | PUT    | Yes  | Admin<br> or order_owner | Add a product to order, must be with status is 'open'    |                  |
 | `/orders/:id/complete`                            | PUT    | Yes  | order_owner only         | Change order status from 'open' to 'completed',<br> It must be an order with products and its previous status is 'opne', <br>User can add a 0-5 star rate and leave a text feedback.    | <code>{<br>&nbsp;"service_rating": 2.5,<br>&nbsp;"feedback": "good service."<br>}</code> |
 | ----                                              | ----   | ---- | ----                     | ----                                        |                  |
