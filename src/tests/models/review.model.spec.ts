@@ -4,16 +4,15 @@ import { Product } from "../../interfaces/Product";
 import { Review } from "../../interfaces/Review";
 import { ProductsModel } from "../../models/product.model";
 import { ReviewsModel } from "../../models/review.modal";
-import { OrdersModel } from './../../models/order.modal';
-import { OrderManagmnetModel } from './../../models/order-managment.model';
-
-const productsModel = new ProductsModel();
-const reviewModel = new ReviewsModel();
-const orderModel = new OrdersModel();
-const orderManagmnetModel = new OrderManagmnetModel();
+import { OrdersModel } from "./../../models/order.modal";
+import { OrderManagmnetModel } from "./../../models/order-managment.model";
 
 describe("Review modal", () => {
-    const { create, index, show } = reviewModel;
+    const productsModel = new ProductsModel();
+    const orderModel = new OrdersModel();
+    const orderManagmnetModel = new OrderManagmnetModel();
+    const { create, index, show } = new ReviewsModel();
+
     describe("Check review model method exists", () => {
         it("should have add review to a completed order method", () => expect(create).toBeDefined());
         it("should have get all reviews method", () => expect(index).toBeDefined());

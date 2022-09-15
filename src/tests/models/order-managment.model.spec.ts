@@ -6,12 +6,11 @@ import { OrdersModel } from "./../../models/order.modal";
 import { Review } from "./../../interfaces/Review";
 import { Order } from "../../interfaces/Order";
 
-const orderManagmnetModel = new OrderManagmnetModel();
-const productsModel = new ProductsModel();
-const orderModel = new OrdersModel();
 
 describe("Order modal", () => {
-    const { addProduct, completeOrder } = orderManagmnetModel;
+    const productsModel = new ProductsModel();
+    const orderModel = new OrdersModel();
+    const { addProduct, completeOrder } = new OrderManagmnetModel();;
 
     describe("Check order managment model method exists", () => {
         it("should have add product to order method", () => expect(addProduct).toBeDefined());

@@ -2,6 +2,7 @@ import { Service } from "typedi";
 import { Request, Response } from "express";
 import { ErrorResponsesService } from "./error-responses.service";
 import { ProductManagmentModel } from "../models/product-managment.model.ts";
+import { ErrorResponse } from "../interfaces/responses/ErrorResponse";
 
 @Service()
 export class ProductsService {
@@ -20,16 +21,8 @@ export class ProductsService {
             res.status(productsByCategoryResponse.status).json(productsByCategoryResponse);
         } catch (err: any) {
             console.log(err);
-
-            if (err?.sqlError?.code === "23502") {
-                // Databse error - not_null_violation
-                res.status(this._errorResponseService.nullValues().status).json(this._errorResponseService.nullValues());
-                return;
-            }
-
-            // Backend error
-            const backendError = this._errorResponseService.createError(err.error, err.status);
-            res.status(err.status).json(backendError);
+            const backendError = err as ErrorResponse;
+            res.status(backendError.status).json(backendError.errors);
         }
     };
 }

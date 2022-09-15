@@ -5,12 +5,34 @@ const request: supertest.SuperTest<supertest.Test> = supertest(app);
 
 describe("Check login routes", () => {
     it("should api has login route", async (): Promise<void> => {
-        const response: supertest.Response = await request.get("/login");
-
+        const response: supertest.Response = await request.post("/login");
         expect(response.type).toBe("application/json");
-        expect(response.body).toEqual({
-            status: 404,
-            error: "User was not found"
+        expect(response.status).toBe(400);
+    });
+    it("should api has register route", async (): Promise<void> => {
+        const response: supertest.Response = await request.post("/register");
+        expect(response.type).toBe("application/json");
+        expect(response.status).toBe(400);
+    });
+
+    it("should user register successfully", async (): Promise<void> => {
+        const response: supertest.Response = await request.post("/register").send({
+            firstname: "user",
+            lastname: "user",
+            username: "user123",
+            email: "user123@user.com",
+            password: "user123"
         });
+        expect(response.type).toBe("application/json");
+        expect(response.status).toBe(201);
+    });
+
+    it("should user login successfully", async (): Promise<void> => {
+        const response: supertest.Response = await request.post("/login").send({
+            username: "user123",
+            password: "user123"
+        });
+        expect(response.type).toBe("application/json");
+        expect(response.status).toBe(200);
     });
 });

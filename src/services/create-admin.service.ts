@@ -1,14 +1,14 @@
 import { Service } from "typedi";
 import { User } from "../interfaces/User";
-import { UsersModel } from "../models/user.model";
-import * as dotenv from "dotenv";
+import { AuthService } from "./auth.service";
 import databaseClient from "../database";
+import * as dotenv from "dotenv";
 
 dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
 
 @Service()
 export class CreateAdmin {
-    constructor(private _usersModel: UsersModel) {}
+    constructor(private _authService: AuthService) {}
     public createAdmin = async () => {
         try {
             const user: User = {
@@ -27,7 +27,7 @@ export class CreateAdmin {
 
             if (result.rowCount) return;
 
-            await this._usersModel.create(user);
+            await this._authService.register(user);
             console.log("First Admin user is created.");
             // eslint-disable-next-line no-empty
         } catch (e) {}

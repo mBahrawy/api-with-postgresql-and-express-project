@@ -4,11 +4,10 @@ import { OrdersModel } from "./../../models/order.modal";
 import { ProductsModel } from "../../models/product.model";
 import { Order } from "./../../interfaces/Order";
 
-const ordersModel = new OrdersModel();
-const productsModel = new ProductsModel();
 
 describe("Order modal", () => {
-    const { index, show, create } = ordersModel;
+    const productsModel = new ProductsModel();
+    const { index, show, create } = new OrdersModel();
 
     describe("Check order model method exists", () => {
         it("should have index orders method", () => expect(index).toBeDefined());

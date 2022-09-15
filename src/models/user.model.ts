@@ -1,12 +1,9 @@
 import databaseClient from "../database";
-import bcrypt from "bcrypt";
-import { Service } from "typedi";
+import Container, { Service } from "typedi";
 import { ErrorResponse } from "../interfaces/responses/ErrorResponse";
 import { FeedbackResponse } from "../interfaces/responses/FeedbackResponse";
 import { User } from "../interfaces/User";
-
-const saltRounds = process.env.SALT_ROUNDS as string;
-const pepper = process.env.BCRYPT_PASSWORD as string;
+import { ErrorResponsesService } from "./../services/error-responses.service";
 
 interface UsersResponse extends ErrorResponse {
     users?: User[];
@@ -18,6 +15,7 @@ interface UserResponse extends ErrorResponse {
 @Service()
 export class UsersModel {
     async index(): Promise<UsersResponse> {
+        const { serverError } = Container.get(ErrorResponsesService);
         try {
             const conn = await databaseClient.connect();
             const sql = `SELECT id, firstname, lastname, username, email, role FROM users`;
@@ -29,25 +27,21 @@ export class UsersModel {
             };
         } catch (err) {
             console.log(err);
-            throw {
-                message: "Could not get users.",
-                sqlError: err
-            };
+            throw serverError("Could not get users.");
         }
     }
 
     async show(id: string): Promise<UserResponse> {
+        const { createError, serverError } = Container.get(ErrorResponsesService);
         try {
+
             const sql = `SELECT id, firstname, lastname, username, email, role FROM users WHERE id=($1)`;
             const conn = await databaseClient.connect();
             const result = await conn.query(sql, [id]);
             conn.release();
 
             if (!result.rowCount) {
-                return {
-                    status: 404,
-                    error: "User was not found"
-                };
+                throw createError("User was not found", 404);
             }
 
             return {
@@ -56,37 +50,12 @@ export class UsersModel {
             };
         } catch (err) {
             console.log(err);
-            throw {
-                message: "Could not get user.",
-                sqlError: err
-            };
-        }
-    }
-
-    async create(u: User): Promise<UserResponse> {
-        try {
-            // eslint-disable-next-line max-len
-            const sql = `INSERT INTO users (firstname, lastname, username, email, role, password_digist) VALUES($1, $2, $3, $4, $5, $6) RETURNING *`;
-            const conn = await databaseClient.connect();
-            const hashedPassword = bcrypt.hashSync(u.password + pepper, parseInt(saltRounds));
-            const result = await conn.query(sql, [u.firstname, u.lastname, u.username, u.email, u.role, hashedPassword]);
-            const user = result.rows[0];
-            conn.release();
-            delete user.password_digist;
-            return {
-                status: 201,
-                user
-            };
-        } catch (err) {
-            console.log(err);
-            throw {
-                message: "Could not add new user.",
-                sqlError: err
-            };
+            throw serverError("Could not get user.");
         }
     }
 
     async destroy(id: string): Promise<FeedbackResponse | ErrorResponse> {
+        const { createError, serverError } = Container.get(ErrorResponsesService);
         try {
             const sql = `DELETE FROM users WHERE id=($1)`;
             const conn = await databaseClient.connect();
@@ -94,10 +63,7 @@ export class UsersModel {
             conn.release();
 
             if (!result.rowCount) {
-                return {
-                    status: 404,
-                    error: "User was not found"
-                };
+                createError("User was not found", 404);
             }
 
             return {
@@ -106,10 +72,7 @@ export class UsersModel {
             };
         } catch (err) {
             console.log(err);
-            throw {
-                message: "Could not delete user.",
-                sqlError: err
-            };
+            throw serverError("Could not delete user.");
         }
     }
 }

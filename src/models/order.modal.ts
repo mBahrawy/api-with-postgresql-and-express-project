@@ -5,6 +5,7 @@ import { Order, OrderItem } from "../interfaces/Order";
 import { Product } from "./../interfaces/Product";
 import { Review } from "./../interfaces/Review";
 import { OrderManagmnetModel } from "./order-managment.model";
+import { ErrorResponsesService } from "../services/error-responses.service";
 
 interface OrdersResponse extends ErrorResponse {
     orders?: Order[];
@@ -16,6 +17,7 @@ interface OrderResponse extends ErrorResponse {
 @Service()
 export class OrdersModel {
     public async index(): Promise<OrdersResponse> {
+        const { serverError } = Container.get(ErrorResponsesService);
         try {
             const conn = await databaseClient.connect();
 
@@ -61,14 +63,13 @@ export class OrdersModel {
             };
         } catch (err) {
             console.log(err);
-            throw {
-                message: "Could not get orders.",
-                sqlError: err
-            };
+            throw serverError("Could not get orders");
         }
     }
 
     public async show(id: string): Promise<OrderResponse> {
+        const { createError, serverError } = Container.get(ErrorResponsesService);
+
         try {
             const conn = await databaseClient.connect();
 
@@ -90,15 +91,10 @@ export class OrdersModel {
                 relatedReview = relatedReviewResult.rows[0];
             }
 
-            // TODO check reviews
-
             conn.release();
 
             if (!orderResult.rowCount) {
-                return {
-                    status: 404,
-                    error: "Order was not found"
-                };
+                throw createError("Order was not found", 404);
             }
 
             return {
@@ -111,14 +107,13 @@ export class OrdersModel {
             };
         } catch (err) {
             console.log(err);
-            throw {
-                message: "Could not get order.",
-                sqlError: err
-            };
+            throw serverError("Could not get order.");
         }
     }
 
     public async create(o: Order | null): Promise<OrderResponse> {
+
+        const { serverError } = Container.get(ErrorResponsesService);
         try {
             const { addProduct } = Container.get(OrderManagmnetModel);
             const { show } = Container.get(OrdersModel);
@@ -144,10 +139,7 @@ export class OrdersModel {
             };
         } catch (err) {
             console.log(err);
-            throw {
-                message: "Could not create order.",
-                sqlError: err
-            };
+            throw serverError("Could not get order.");
         }
     }
 }

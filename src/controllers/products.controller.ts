@@ -4,6 +4,7 @@ import { ProductsModel } from "../models/product.model";
 import { Product } from "../interfaces/Product";
 import { JWT } from "./../services/jwt.service";
 import { ErrorResponsesService } from "../services/error-responses.service";
+import { ErrorResponse } from "../interfaces/responses/ErrorResponse";
 
 @Service()
 export class ProductsController {
@@ -76,17 +77,8 @@ export class ProductsController {
             res.status(deletedProductRes.status).json(deletedProductRes);
         } catch (err: any) {
             console.log(err);
-
-            if (err?.sqlError?.code === "23503") {
-                // Databse error - foreign_key_violation
-                const databseError = this._errorResponseService.entityRelationError(
-                    "This product is related to an order, cant be deleted."
-                );
-                res.status(databseError.status).json(databseError);
-                return;
-            }
-
-            res.status(this._errorResponseService.serverError().status).json(this._errorResponseService.serverError());
+            const backendError = err as ErrorResponse;
+            res.status(backendError.status).json(backendError.errors);
         }
     };
 }

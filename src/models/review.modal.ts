@@ -3,7 +3,8 @@ import Container, { Service } from "typedi";
 import { ErrorResponse } from "../interfaces/responses/ErrorResponse";
 import { Review } from "../interfaces/Review";
 import { OrdersModel } from "./order.modal";
-import { Order } from './../interfaces/Order';
+import { Order } from "./../interfaces/Order";
+import { ErrorResponsesService } from "../services/error-responses.service";
 
 interface ReviewsResponse extends ErrorResponse {
     reviews?: Review[];
@@ -16,6 +17,7 @@ interface ReviewResponse extends ErrorResponse {
 @Service()
 export class ReviewsModel {
     public async index(): Promise<ReviewsResponse> {
+        const { serverError } = Container.get(ErrorResponsesService);
         try {
             const conn = await databaseClient.connect();
 
@@ -30,14 +32,13 @@ export class ReviewsModel {
             };
         } catch (err) {
             console.log(err);
-            throw {
-                message: "Could not get reviews.",
-                sqlError: err
-            };
+            throw serverError("Could not get reviews.");
         }
     }
 
     public async show(id: string): Promise<ReviewResponse> {
+        const { createError, serverError } = Container.get(ErrorResponsesService);
+
         try {
             const conn = await databaseClient.connect();
 
@@ -46,10 +47,7 @@ export class ReviewsModel {
             const reviewResult = await conn.query(reviewSql, [id]);
 
             if (!reviewResult.rowCount) {
-                return {
-                    status: 404,
-                    error: "Review was not found"
-                };
+                throw createError("Review was not found", 404);
             }
 
             return {
@@ -58,36 +56,27 @@ export class ReviewsModel {
             };
         } catch (err) {
             console.log(err);
-            throw {
-                message: "Could not get review.",
-                sqlError: err
-            };
+            throw serverError("Could not get review.");
         }
     }
 
     public async create(r: Review): Promise<ReviewResponse> {
+        const { createError, serverError } = Container.get(ErrorResponsesService);
+
         try {
             const { show: getOrder } = Container.get(OrdersModel);
 
             const order = await getOrder(`${r.id}`);
 
             if (order.order?.status !== "completed") {
-                throw {
-                    status: 400,
-                    message: "The relative order is not completed yet."
-                };
+                throw createError("The relative order is not completed yet.", 400);
             }
+
             if (order.order?.products && order.order?.products.length === 0) {
-                throw {
-                    status: 400,
-                    message: "The relative order doesn't contain any products."
-                };
+                throw createError("The relative order doesn't contain any products.", 400);
             }
             if (order.order?.review) {
-                throw {
-                    status: 400,
-                    message: "The relative order has already reviewed."
-                };
+                throw createError("The relative order has already reviewed.", 400);
             }
 
             const conn = await databaseClient.connect();
@@ -105,7 +94,7 @@ export class ReviewsModel {
             };
         } catch (err) {
             console.log(err);
-            throw err;
+            throw serverError();
         }
     }
 }

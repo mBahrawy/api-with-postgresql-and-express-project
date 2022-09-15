@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import { ErrorResponsesService } from "./error-responses.service";
 import { Review } from "../interfaces/Review";
 import { OrderManagmnetModel } from "../models/order-managment.model";
+import { ErrorResponse } from "../interfaces/responses/ErrorResponse";
 
 @Service()
 export class OrdersService {
@@ -23,14 +24,8 @@ export class OrdersService {
             res.status(completedOrderRes.status).json(completedOrderRes);
         } catch (err: any) {
             console.log(err);
-            if (err?.sqlError?.code === "23502") {
-                // Databse error - not_null_violation
-                res.status(this._errorResponseService.nullValues().status).json(this._errorResponseService.nullValues());
-                return;
-            }
-            // Backend error
-            const backendError = this._errorResponseService.createError(err.error, err.status);
-            res.status(err.status).json(backendError);
+            const backendError = err as ErrorResponse;
+            res.status(backendError.status).json(backendError.errors);
         }
     };
 
@@ -50,16 +45,8 @@ export class OrdersService {
             res.status(addedItemResponse.status).json(addedItemResponse);
         } catch (err: any) {
             console.log(err);
-
-            if (err?.sqlError?.code === "23502") {
-                // Databse error - not_null_violation
-                res.status(this._errorResponseService.nullValues().status).json(this._errorResponseService.nullValues());
-                return;
-            }
-
-            // Backend error
-            const backendError = this._errorResponseService.createError(err.error, err.status);
-            res.status(err.status).json(backendError);
+            const backendError = err as ErrorResponse;
+            res.status(backendError.status).json(backendError.errors);
         }
     };
 }

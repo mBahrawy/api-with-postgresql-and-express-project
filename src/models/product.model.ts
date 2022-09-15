@@ -1,8 +1,9 @@
 import databaseClient from "../database";
-import { Service } from "typedi";
+import Container, { Service } from "typedi";
 import { ErrorResponse } from "../interfaces/responses/ErrorResponse";
 import { FeedbackResponse } from "../interfaces/responses/FeedbackResponse";
 import { Product } from "../interfaces/Product";
+import { ErrorResponsesService } from "../services/error-responses.service";
 
 interface ProductsResponse extends ErrorResponse {
     products?: Product[];
@@ -14,6 +15,8 @@ interface ProductResponse extends ErrorResponse {
 @Service()
 export class ProductsModel {
     public async index(): Promise<ProductsResponse> {
+        const { serverError } = Container.get(ErrorResponsesService);
+
         try {
             const conn = await databaseClient.connect();
             const sql = `SELECT * FROM products`;
@@ -25,14 +28,15 @@ export class ProductsModel {
                 products: result.rows ?? []
             };
         } catch (err) {
-            throw {
-                message: "Could not get products.",
-                sqlError: err
-            };
+            console.log(err);
+
+            throw serverError("Could not get products.");
         }
     }
 
     public async show(id: string): Promise<ProductResponse> {
+        const { createError, serverError } = Container.get(ErrorResponsesService);
+
         try {
             const sql = `SELECT * FROM products WHERE id=($1)`;
             const conn = await databaseClient.connect();
@@ -40,10 +44,7 @@ export class ProductsModel {
             conn.release();
 
             if (!result.rowCount) {
-                return {
-                    status: 404,
-                    error: "Product was not found"
-                };
+                throw createError("Product was not found", 404);
             }
 
             return {
@@ -52,14 +53,12 @@ export class ProductsModel {
             };
         } catch (err) {
             console.log(err);
-            throw {
-                message: "Could not get product.",
-                sqlError: err
-            };
+            throw serverError("Could not get product.");
         }
     }
 
     public async create(p: Product): Promise<ProductResponse> {
+        const { serverError } = Container.get(ErrorResponsesService);
         try {
             const conn = await databaseClient.connect();
             // eslint-disable-next-line max-len
@@ -73,14 +72,13 @@ export class ProductsModel {
             };
         } catch (err) {
             console.log(err);
-            throw {
-                message: "Could not create products.",
-                sqlError: err
-            };
+            throw serverError("Could not create product.");
         }
     }
 
     public async destroy(id: string): Promise<FeedbackResponse | ErrorResponse> {
+        const { createError, serverError } = Container.get(ErrorResponsesService);
+
         try {
             const sql = `DELETE FROM products WHERE id=($1)`;
             const conn = await databaseClient.connect();
@@ -88,10 +86,7 @@ export class ProductsModel {
             conn.release();
 
             if (!result.rowCount) {
-                return {
-                    status: 404,
-                    error: "Product was not found"
-                };
+                throw createError("Product was not found", 404);
             }
 
             return {
@@ -100,10 +95,7 @@ export class ProductsModel {
             };
         } catch (err) {
             console.log(err);
-            throw {
-                message: "Could not delete product.",
-                sqlError: err
-            };
+            throw serverError("Could not delete product.");
         }
     }
 }

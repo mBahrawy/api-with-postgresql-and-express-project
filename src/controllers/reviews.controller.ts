@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import { ReviewsModel } from "../models/review.modal";
 import { Review } from "../interfaces/Review";
 import { ErrorResponsesService } from "../services/error-responses.service";
+import { ErrorResponse } from "../interfaces/responses/ErrorResponse";
 
 @Service()
 export class ReviewsController {
@@ -14,7 +15,8 @@ export class ReviewsController {
             res.status(reviewRespose.status).json(reviewRespose);
         } catch (err: any) {
             console.log(err);
-            res.status(this._errorResponseService.serverError().status).json(this._errorResponseService.serverError());
+            const backendError = err as ErrorResponse;
+            res.status(backendError.status).json(backendError.errors);
         }
     };
 
@@ -24,7 +26,8 @@ export class ReviewsController {
             res.status(reviewsResponse.status).json(reviewsResponse);
         } catch (err: any) {
             console.log(err);
-            res.status(this._errorResponseService.serverError().status).json(this._errorResponseService.serverError());
+            const backendError = err as ErrorResponse;
+            res.status(backendError.status).json(backendError.errors);
         }
     };
 
@@ -40,15 +43,8 @@ export class ReviewsController {
             res.status(newReviewResponse.status).json(newReviewResponse);
         } catch (err: any) {
             console.log(err);
-            if (err?.sqlError?.code === "23502") {
-                // Databse error - not_null_violation
-                res.status(this._errorResponseService.nullValues().status).json(this._errorResponseService.nullValues());
-                return;
-            }
-            
-            // Backend error
-            const backendError = this._errorResponseService.createError(err.message, err.status);
-            res.status(err.status).json(backendError);
+            const backendError = err as ErrorResponse;
+            res.status(backendError.status).json(backendError.errors);
         }
     };
 }

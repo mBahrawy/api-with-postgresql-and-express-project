@@ -1,32 +1,40 @@
 import databaseClient from "../database";
-import { Service } from "typedi";
+import Container, { Service } from "typedi";
 import { ErrorResponse } from "../interfaces/responses/ErrorResponse";
 import { Product } from "../interfaces/Product";
+import { ErrorResponsesService } from "../services/error-responses.service";
 
 interface ProductsResponse extends ErrorResponse {
     products?: Product[];
 }
 
-
 @Service()
 export class ProductManagmentModel {
     public async getProductsByCategory(id: string): Promise<ProductsResponse> {
+        const { serverError } = Container.get(ErrorResponsesService);
         try {
+            const { createError } = Container.get(ErrorResponsesService);
             const conn = await databaseClient.connect();
-            const sql = `SELECT * FROM products WHERE id=($1)`;
-            const result = await conn.query(sql, [id]);
+
+            const categorySql = `SELECT * FROM categories WHERE id=($1)`;
+            const categoryResult = await conn.query(categorySql, [id]);
+
+            if (!categoryResult.rowCount) {
+                throw createError("Category was not found", 404);
+            }
+
+            const productsSql = `SELECT * FROM products WHERE category_id=($1)`;
+            const productsResult = await conn.query(productsSql, [id]);
+
             conn.release();
 
             return {
                 status: 200,
-                products: result.rows ?? []
+                products: productsResult.rows ?? []
             };
         } catch (err) {
             console.log(err);
-            throw {
-                message: "Could not get products.",
-                sqlError: err
-            };
+            throw serverError("Could not get products.");
         }
     }
 }

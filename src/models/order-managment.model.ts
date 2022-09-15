@@ -1,8 +1,9 @@
 import databaseClient from "../database";
-import { Service } from "typedi";
+import Container, { Service } from "typedi";
 import { ErrorResponse } from "../interfaces/responses/ErrorResponse";
 import { Order } from "../interfaces/Order";
 import { Review } from "./../interfaces/Review";
+import { ErrorResponsesService } from "../services/error-responses.service";
 
 interface OrderResponse extends ErrorResponse {
     order?: Order;
@@ -11,6 +12,8 @@ interface OrderResponse extends ErrorResponse {
 @Service()
 export class OrderManagmnetModel {
     public async addProduct(quantity: number, order_id: number, product_id: number): Promise<OrderResponse> {
+        
+const { createError, serverError } = Container.get(ErrorResponsesService);
         try {
             const conn = await databaseClient.connect();
 
@@ -20,10 +23,7 @@ export class OrderManagmnetModel {
             const order = orderResult.rows[0] as Order;
 
             if (order.status !== "open") {
-                throw {
-                    status: 422,
-                    error: `Could not add product ${product_id} to order ${order_id} because order status is ${order.status}`
-                };
+                throw createError(`Could not add product ${product_id} to order ${order_id} because order status is ${order.status}`, 422);
             }
 
             // Get current product price
@@ -31,10 +31,7 @@ export class OrderManagmnetModel {
             const productPriceResult = await conn.query(productPriceSql, [product_id]);
 
             if (productPriceResult.rowCount === 0) {
-                throw {
-                    status: 404,
-                    error: `A product doesnt't exsist`
-                };
+                throw createError("A product doesnt't exsist", 404);
             }
 
             const productPrice = productPriceResult.rows[0].price as number;
@@ -56,14 +53,12 @@ export class OrderManagmnetModel {
             };
         } catch (err) {
             console.log(err);
-            throw {
-                message: "Could not add product to the order.",
-                sqlError: err
-            };
+            throw serverError("Could not add product to the order.");
         }
     }
 
     public async completeOrder(order_id: number, review: Review | null): Promise<OrderResponse> {
+        const { createError, serverError } = Container.get(ErrorResponsesService);
         try {
             const conn = await databaseClient.connect();
 
@@ -73,17 +68,11 @@ export class OrderManagmnetModel {
             const order = orderResult.rows[0] as Order;
 
             if (orderResult.rowCount === 0) {
-                throw {
-                    status: 404,
-                    error: `Order doesn't exsists`
-                };
+                throw createError("Order was not found", 404);
             }
 
             if (order.status !== "open") {
-                throw {
-                    status: 422,
-                    error: `Could not complete order ${order_id} because order status is ${order.status}`
-                };
+                throw createError(`Could not complete order ${order_id} because order status is ${order.status}`, 422);
             }
 
             if (review) {
@@ -102,7 +91,7 @@ export class OrderManagmnetModel {
             };
         } catch (err) {
             console.log(err);
-            throw err;
+            throw serverError();
         }
     }
 }

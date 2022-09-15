@@ -4,6 +4,7 @@ import { CategoriesModel } from "../models/category.model";
 import { Category } from "../interfaces/Category";
 import { JWT } from "../services/jwt.service";
 import { ErrorResponsesService } from "../services/error-responses.service";
+import { ErrorResponse } from "../interfaces/responses/ErrorResponse";
 
 @Service()
 export class CategoriesController {
@@ -15,7 +16,8 @@ export class CategoriesController {
             res.status(categoriesRes.status).json(categoriesRes);
         } catch (err: any) {
             console.log(err);
-            res.status(this._errorResponseService.serverError().status).json(this._errorResponseService.serverError());
+            const backendError = err as ErrorResponse;
+            res.status(backendError.status).json(backendError.errors);
         }
     };
 
@@ -25,7 +27,8 @@ export class CategoriesController {
             res.status(categoryRes.status).json(categoryRes);
         } catch (err: any) {
             console.log(err);
-            res.status(this._errorResponseService.serverError().status).json(this._errorResponseService.serverError());
+            const backendError = err as ErrorResponse;
+            res.status(backendError.status).json(backendError.errors);
         }
     };
 
@@ -44,19 +47,8 @@ export class CategoriesController {
             res.status(newCategoryRes.status).json(newCategoryRes);
         } catch (err: any) {
             console.log(err);
-
-            if (err?.sqlError?.code === "23502") {
-                // Databse error - not_null_violation
-                res.status(this._errorResponseService.nullValues().status).json(this._errorResponseService.nullValues());
-                return;
-            }
-            if (err?.sqlError?.codee === "23505") {
-                // Databse error - unique_violation
-                res.status(this._errorResponseService.dublicatedValues().status).json(this._errorResponseService.dublicatedValues());
-                return;
-            }
-
-            res.status(this._errorResponseService.serverError().status).json(this._errorResponseService.serverError());
+            const backendError = err as ErrorResponse;
+            res.status(backendError.status).json(backendError.errors);
         }
     };
 
@@ -66,17 +58,8 @@ export class CategoriesController {
             res.status(deletedProductRes.status).json(deletedProductRes);
         } catch (err: any) {
             console.log(err);
-
-            if (err?.sqlError?.code === "23503") {
-                // Databse error - foreign_key_violation
-                const databseError = this._errorResponseService.entityRelationError(
-                    "This product is related to an order, cant be deleted."
-                );
-                res.status(databseError.status).json(databseError);
-                return;
-            }
-
-            res.status(this._errorResponseService.serverError().status).json(this._errorResponseService.serverError());
+            const backendError = err as ErrorResponse;
+            res.status(backendError.status).json(backendError.errors);
         }
     };
 }

@@ -1,10 +1,8 @@
 import { describe } from "test";
 import { ProductManagmentModel } from "../../models/product-managment.model.ts";
 
-const productManagmentModel = new ProductManagmentModel();
-
 describe("Product modal", () => {
-    const { getProductsByCategory } = productManagmentModel;
+    const { getProductsByCategory } = new ProductManagmentModel();
 
     describe("Check product managmanet model method exists", () => {
         it("should have get products by categories method", () => expect(getProductsByCategory).toBeDefined());

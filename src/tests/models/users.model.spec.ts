@@ -1,33 +1,34 @@
 import { describe } from "test";
 import { UsersModel } from "../../models/user.model";
 import { User } from "../../interfaces/User";
+import { AuthService } from "./../../services/auth.service";
+import { Container } from "typedi";
 
-const usersModal = new UsersModel();
 
 describe("Product modal", () => {
-    const { index, show, create, destroy } = usersModal;
+    const { register } = Container.get(AuthService);
+    const { index, show, destroy } = new UsersModel();
 
     describe("Check user model method exists", () => {
         it("should have index users method", () => expect(index).toBeDefined());
         it("should have show user method", () => expect(show).toBeDefined());
-        it("should have create user method", () => expect(create).toBeDefined());
         it("should have delete user method", () => expect(destroy).toBeDefined());
     });
 
     describe("Test user model methods functionality", () => {
-        it("should create a user", async () => {
-            const user: User = {
-                firstname: "dummyUser",
-                lastname: "dummyUser",
-                username: "dummyUser",
-                email: "dummyUser@dummyUser.com",
-                password: "dummyUser",
-                role: "regular"
-            };
+        // it("should create a user", async () => {
+        //     const user: User = {
+        //         firstname: "dummyUser",
+        //         lastname: "dummyUser",
+        //         username: "dummyUser",
+        //         email: "dummyUser@dummyUser.com",
+        //         password: "dummyUser",
+        //         role: "regular"
+        //     };
 
-            const result = await create(user);
-            expect(result.status).toEqual(201);
-        });
+        //     const result = await create(user);
+        //     expect(result.status).toEqual(201);
+        // });
 
         it("should get a user", async () => {
             // Create a user to be displayed
@@ -39,7 +40,7 @@ describe("Product modal", () => {
                 password: "dummyUser",
                 role: "regular"
             };
-            const userResponse = await usersModal.create(user);
+            const userResponse = await register(user);
             const userId = userResponse.user?.id;
             const result = await show(`${userId}`);
             expect(result.status).toEqual(200);
@@ -60,7 +61,7 @@ describe("Product modal", () => {
                 password: "dummyUser",
                 role: "regular"
             };
-            const userResponse = await usersModal.create(user);
+            const userResponse = await register(user);
             const userId = userResponse.user?.id;
 
             // Appley delete

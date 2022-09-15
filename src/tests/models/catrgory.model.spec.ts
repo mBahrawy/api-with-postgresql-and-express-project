@@ -2,10 +2,9 @@ import { describe } from "test";
 import { CategoriesModel } from "./../../models/category.model";
 import { Category } from "./../../interfaces/Category";
 
-const categoriesModel = new CategoriesModel();
 
 describe("Category modal", () => {
-    const { index, show, create, destroy } = categoriesModel;
+    const { index, show, create, destroy } = new CategoriesModel();
 
     describe("Check category model method exists", () => {
         it("should have index catrgories method", () => expect(index).toBeDefined());

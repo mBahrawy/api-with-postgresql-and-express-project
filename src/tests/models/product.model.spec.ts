@@ -4,11 +4,9 @@ import { ProductsModel } from "../../models/product.model";
 import { CategoriesModel } from "./../../models/category.model";
 import { Category } from "./../../interfaces/Category";
 
-const productsModel = new ProductsModel();
-const categoriesModel = new CategoriesModel();
-
 describe("Product modal", () => {
-    const { index, show, create, destroy } = productsModel;
+    const categoriesModel = new CategoriesModel();
+    const { index, show, create, destroy } = new ProductsModel();
 
     beforeAll(async (): Promise<void> => {
         try {
@@ -66,7 +64,7 @@ describe("Product modal", () => {
                 user_id: 1
             };
 
-            const productResponse = await productsModel.create(product);
+            const productResponse = await create(product);
             const productId = productResponse.product?.id;
 
             // Appley delete
