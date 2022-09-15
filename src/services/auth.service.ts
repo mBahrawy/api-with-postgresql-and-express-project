@@ -29,12 +29,12 @@ export class AuthService {
             const result = await conn.query(sql, [username]);
 
             if (!result.rows.length) {
-                throw createError("User was not found", 404);
+                return createError("User was not found", 404);
             }
 
             const user = result.rows[0];
             if (!bcrypt.compareSync(password + pepper, user.password_digist)) {
-                throw createError("Username/Password is not correct", 404);
+                return createError("Username/Password is not correct", 404);
             }
             delete user.password_digist;
             const resUserData = { ...user, token: jwt.createToken(user) };
@@ -45,7 +45,7 @@ export class AuthService {
             };
         } catch (err) {
             console.log(err);
-            throw serverError("Error happened during auth.");
+            throw serverError(err, "Error happened during auth.");
         }
     };
 
@@ -66,7 +66,7 @@ export class AuthService {
             };
         } catch (err) {
             console.log(err);
-            throw serverError("Could not add new user.");
+            throw serverError(err, "Could not add new user.");
         }
     }
 }

@@ -1,9 +1,9 @@
-import { Service } from "typedi";
+import Container, { Service } from "typedi";
 import { ErrorResponse } from "../interfaces/responses/ErrorResponse";
 
 @Service()
 export class ErrorResponsesService {
-    public createError(msg = "Somthing wrong happened", status = 400): ErrorResponse {
+    public createError(msg = "Something went wrong, please try later", status = 500): ErrorResponse {
         return {
             errors: [msg],
             status: status
@@ -27,12 +27,6 @@ export class ErrorResponsesService {
             status: 404
         };
     }
-    public serverError(msg = "Something went wrong, please try later"): ErrorResponse {
-        return {
-            errors: [msg],
-            status: 500
-        };
-    }
     public nullValues(msg = "Some inputs are required, please check them and try again."): ErrorResponse {
         return {
             errors: [msg],
@@ -45,4 +39,16 @@ export class ErrorResponsesService {
             status: 400
         };
     }
+    public serverError(error, msg = "Something went wrong, please try later") {
+        const { createError } = Container.get(ErrorResponsesService);
+        if (!!error?.code && error?.code.toString().length > 3) {
+            // This is postgres database error
+            return {
+                errors: createError(msg),
+                status: createError(msg).status
+            };
+        }
+        return error;
+    }
+    
 }

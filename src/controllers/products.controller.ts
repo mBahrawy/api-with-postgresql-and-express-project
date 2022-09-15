@@ -16,7 +16,8 @@ export class ProductsController {
             res.status(productsRes.status).json(productsRes);
         } catch (err: any) {
             console.log(err);
-            res.status(this._errorResponseService.serverError().status).json(this._errorResponseService.serverError());
+            const backendError = err as ErrorResponse;
+            res.status(backendError.status).json(backendError.errors);
         }
     };
 
@@ -26,7 +27,8 @@ export class ProductsController {
             res.status(productRes.status).json(productRes);
         } catch (err: any) {
             console.log(err);
-            res.status(this._errorResponseService.serverError().status).json(this._errorResponseService.serverError());
+            const backendError = err as ErrorResponse;
+            res.status(backendError.status).json(backendError.errors);
         }
     };
 
@@ -48,26 +50,9 @@ export class ProductsController {
             const newProductRes = await this._productsModel.create(product);
             res.status(newProductRes.status).json(newProductRes);
         } catch (err: any) {
-            if (err?.sqlError?.code === "23502") {
-                // Databse error - not_null_violation
-                res.status(this._errorResponseService.nullValues().status).json(this._errorResponseService.nullValues());
-                return;
-            }
-            if (err?.sqlError?.code === "23505") {
-                // Databse error - unique_violation
-                res.status(this._errorResponseService.dublicatedValues().status).json(this._errorResponseService.dublicatedValues());
-                return;
-            }
-            if (err?.sqlError?.code === "23503") {
-                // Databse error - foreign_key_violation
-                const error = this._errorResponseService.entityRelationError("This product is related to an order, cant be deleted.");
-                res.status(error.status).json(error);
-                return;
-            }
-
-            // Backend error
-            const backendError = this._errorResponseService.createError(err.error, err.status);
-            res.status(err.status).json(backendError);
+            console.log(err);
+            const backendError = err as ErrorResponse;
+            res.status(backendError.status).json(backendError.errors);
         }
     };
 

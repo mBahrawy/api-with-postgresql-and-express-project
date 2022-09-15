@@ -8,11 +8,13 @@ interface ProductsResponse extends ErrorResponse {
     products?: Product[];
 }
 
+
 @Service()
 export class ProductManagmentModel {
     public async getProductsByCategory(id: string): Promise<ProductsResponse> {
         const { serverError } = Container.get(ErrorResponsesService);
         try {
+
             const { createError } = Container.get(ErrorResponsesService);
             const conn = await databaseClient.connect();
 
@@ -20,21 +22,25 @@ export class ProductManagmentModel {
             const categoryResult = await conn.query(categorySql, [id]);
 
             if (!categoryResult.rowCount) {
-                throw createError("Category was not found", 404);
+                return createError("Category was not found", 404);
             }
+
 
             const productsSql = `SELECT * FROM products WHERE category_id=($1)`;
             const productsResult = await conn.query(productsSql, [id]);
 
+
             conn.release();
+            
+
 
             return {
                 status: 200,
                 products: productsResult.rows ?? []
             };
-        } catch (err) {
+        } catch (err: any) {
             console.log(err);
-            throw serverError("Could not get products.");
+            throw serverError(err, "Could not get products.");
         }
     }
 }

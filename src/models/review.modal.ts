@@ -32,7 +32,7 @@ export class ReviewsModel {
             };
         } catch (err) {
             console.log(err);
-            throw serverError("Could not get reviews.");
+            throw serverError(err, "Could not get reviews.");
         }
     }
 
@@ -47,7 +47,7 @@ export class ReviewsModel {
             const reviewResult = await conn.query(reviewSql, [id]);
 
             if (!reviewResult.rowCount) {
-                throw createError("Review was not found", 404);
+                return createError("Review was not found", 404);
             }
 
             return {
@@ -56,7 +56,7 @@ export class ReviewsModel {
             };
         } catch (err) {
             console.log(err);
-            throw serverError("Could not get review.");
+            throw serverError(err, "Could not get review.");
         }
     }
 
@@ -69,14 +69,14 @@ export class ReviewsModel {
             const order = await getOrder(`${r.id}`);
 
             if (order.order?.status !== "completed") {
-                throw createError("The relative order is not completed yet.", 400);
+                return createError("The relative order is not completed yet.", 400);
             }
 
             if (order.order?.products && order.order?.products.length === 0) {
-                throw createError("The relative order doesn't contain any products.", 400);
+                return createError("The relative order doesn't contain any products.", 400);
             }
             if (order.order?.review) {
-                throw createError("The relative order has already reviewed.", 400);
+                return createError("The relative order has already reviewed.", 400);
             }
 
             const conn = await databaseClient.connect();
@@ -94,7 +94,7 @@ export class ReviewsModel {
             };
         } catch (err) {
             console.log(err);
-            throw serverError();
+            throw serverError(err);
         }
     }
 }

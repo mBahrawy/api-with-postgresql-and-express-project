@@ -63,7 +63,7 @@ export class OrdersModel {
             };
         } catch (err) {
             console.log(err);
-            throw serverError("Could not get orders");
+            throw serverError(err, "Could not get orders");
         }
     }
 
@@ -94,7 +94,7 @@ export class OrdersModel {
             conn.release();
 
             if (!orderResult.rowCount) {
-                throw createError("Order was not found", 404);
+                return createError("Order was not found", 404);
             }
 
             return {
@@ -107,7 +107,7 @@ export class OrdersModel {
             };
         } catch (err) {
             console.log(err);
-            throw serverError("Could not get order.");
+            throw serverError(err, "Could not get order.");
         }
     }
 
@@ -139,7 +139,7 @@ export class OrdersModel {
             };
         } catch (err) {
             console.log(err);
-            throw serverError("Could not get order.");
+            throw serverError(err, "Could not get order.");
         }
     }
 }

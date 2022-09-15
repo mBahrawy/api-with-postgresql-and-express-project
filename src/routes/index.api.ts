@@ -5,11 +5,11 @@ import productsRouteHandler from "./api/products-route.handler";
 import ordersRouteHandler from "./api/orders-route.handler";
 import categoriesRouteHandler from "./api/categories-route.handler";
 import reviewsRouteHandler from "./api/reviews-route.handler";
-import organizeResponse from "../middlewares/organize-response.middleware";
+import formateResponse from "../middlewares/formate-response.middleware";
 
 const routes: Router = express.Router();
 
-routes.use(organizeResponse);
+routes.use(formateResponse);
 
 // for parsing application/json
 routes.use(express.json());

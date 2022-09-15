@@ -23,7 +23,7 @@ const { createError, serverError } = Container.get(ErrorResponsesService);
             const order = orderResult.rows[0] as Order;
 
             if (order.status !== "open") {
-                throw createError(`Could not add product ${product_id} to order ${order_id} because order status is ${order.status}`, 422);
+                return createError(`Could not add product ${product_id} to order ${order_id} because order status is ${order.status}`, 422);
             }
 
             // Get current product price
@@ -31,7 +31,7 @@ const { createError, serverError } = Container.get(ErrorResponsesService);
             const productPriceResult = await conn.query(productPriceSql, [product_id]);
 
             if (productPriceResult.rowCount === 0) {
-                throw createError("A product doesnt't exsist", 404);
+                return createError("A product doesnt't exsist", 404);
             }
 
             const productPrice = productPriceResult.rows[0].price as number;
@@ -53,7 +53,7 @@ const { createError, serverError } = Container.get(ErrorResponsesService);
             };
         } catch (err) {
             console.log(err);
-            throw serverError("Could not add product to the order.");
+            throw serverError(err, "Could not add product to the order.");
         }
     }
 
@@ -68,11 +68,11 @@ const { createError, serverError } = Container.get(ErrorResponsesService);
             const order = orderResult.rows[0] as Order;
 
             if (orderResult.rowCount === 0) {
-                throw createError("Order was not found", 404);
+                return createError("Order was not found", 404);
             }
 
             if (order.status !== "open") {
-                throw createError(`Could not complete order ${order_id} because order status is ${order.status}`, 422);
+                return createError(`Could not complete order ${order_id} because order status is ${order.status}`, 422);
             }
 
             if (review) {
@@ -91,7 +91,7 @@ const { createError, serverError } = Container.get(ErrorResponsesService);
             };
         } catch (err) {
             console.log(err);
-            throw serverError();
+            throw serverError(err);
         }
     }
 }

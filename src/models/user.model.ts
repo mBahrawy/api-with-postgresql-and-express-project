@@ -27,7 +27,7 @@ export class UsersModel {
             };
         } catch (err) {
             console.log(err);
-            throw serverError("Could not get users.");
+            throw serverError(err, "Could not get users.");
         }
     }
 
@@ -41,7 +41,7 @@ export class UsersModel {
             conn.release();
 
             if (!result.rowCount) {
-                throw createError("User was not found", 404);
+                return createError("User was not found", 404);
             }
 
             return {
@@ -50,7 +50,7 @@ export class UsersModel {
             };
         } catch (err) {
             console.log(err);
-            throw serverError("Could not get user.");
+            throw serverError(err, "Could not get user.");
         }
     }
 
@@ -63,7 +63,7 @@ export class UsersModel {
             conn.release();
 
             if (!result.rowCount) {
-                createError("User was not found", 404);
+                return createError("User was not found", 404);
             }
 
             return {
@@ -72,7 +72,7 @@ export class UsersModel {
             };
         } catch (err) {
             console.log(err);
-            throw serverError("Could not delete user.");
+            throw serverError(err, "Could not delete user.");
         }
     }
 }

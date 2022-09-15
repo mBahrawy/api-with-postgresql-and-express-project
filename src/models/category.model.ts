@@ -28,8 +28,11 @@ export class CategoriesModel {
             };
         } catch (err) {
             console.log(err);
-            throw serverError("Could not get categories.");
+            throw serverError(err, "Could not get categories.");
         }
+
+ 
+
     }
 
     async show(id: string): Promise<CategoryResponse> {
@@ -42,7 +45,7 @@ export class CategoriesModel {
             conn.release();
 
             if (!result.rowCount) {
-                throw createError("Category was not found", 404);
+                return createError("Category was not found", 404);
             }
 
             return {
@@ -51,7 +54,7 @@ export class CategoriesModel {
             };
         } catch (err) {
             console.log(err);
-            throw serverError("Could not get category.");
+            throw serverError(err, "Could not get category.");
         }
     }
 
@@ -69,7 +72,7 @@ export class CategoriesModel {
             };
         } catch (err) {
             console.log(err);
-            throw serverError("Could not create categories.");
+            throw serverError(err, "Could not create categories.");
         }
     }
 
@@ -83,7 +86,7 @@ export class CategoriesModel {
             conn.release();
 
             if (!result.rowCount) {
-                throw createError("Category was not found", 404);
+                return createError("Category was not found", 404);
             }
 
             return {
@@ -92,7 +95,7 @@ export class CategoriesModel {
             };
         } catch (err) {
             console.log(err);
-            throw serverError("Could not delete category.");
+            throw serverError(err, "Could not delete category.");
         }
     }
 }

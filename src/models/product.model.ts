@@ -30,7 +30,7 @@ export class ProductsModel {
         } catch (err) {
             console.log(err);
 
-            throw serverError("Could not get products.");
+            throw serverError(err, "Could not get products.");
         }
     }
 
@@ -44,7 +44,7 @@ export class ProductsModel {
             conn.release();
 
             if (!result.rowCount) {
-                throw createError("Product was not found", 404);
+                return createError("Product was not found", 404);
             }
 
             return {
@@ -53,7 +53,7 @@ export class ProductsModel {
             };
         } catch (err) {
             console.log(err);
-            throw serverError("Could not get product.");
+            throw serverError(err, "Could not get product.");
         }
     }
 
@@ -72,7 +72,7 @@ export class ProductsModel {
             };
         } catch (err) {
             console.log(err);
-            throw serverError("Could not create product.");
+            throw serverError(err, "Could not create product.");
         }
     }
 
@@ -86,7 +86,7 @@ export class ProductsModel {
             conn.release();
 
             if (!result.rowCount) {
-                throw createError("Product was not found", 404);
+                return createError("Product was not found", 404);
             }
 
             return {
@@ -95,7 +95,7 @@ export class ProductsModel {
             };
         } catch (err) {
             console.log(err);
-            throw serverError("Could not delete product.");
+            throw serverError(err, "Could not delete product.");
         }
     }
 }
