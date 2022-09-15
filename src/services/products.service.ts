@@ -21,8 +21,7 @@ export class ProductsService {
             res.status(productsByCategoryResponse.status).json(productsByCategoryResponse);
         } catch (err: any) {
             console.log(err);
-            const backendError = err as ErrorResponse;
-            res.status(backendError.status).json(backendError.errors);
+            res.status(err.status).json(err.errors);
         }
     };
 }

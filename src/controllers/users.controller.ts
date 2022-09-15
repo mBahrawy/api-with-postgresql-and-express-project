@@ -14,8 +14,7 @@ export class UsersController {
             res.status(usersRes.status).json(usersRes);
         } catch (err: any) {
             console.log(err);
-            const backendError = err as ErrorResponse;
-            res.status(backendError.status).json(backendError.errors);
+            res.status(err.status).json(err.errors);
         }
     };
 
@@ -25,8 +24,7 @@ export class UsersController {
             res.status(userRes.status).json(userRes);
         } catch (err: any) {
             console.log(err);
-            const backendError = err as ErrorResponse;
-            res.status(backendError.status).json(backendError.errors);
+            res.status(err.status).json(err.errors);
         }
     };
 
@@ -36,8 +34,7 @@ export class UsersController {
             res.status(deletedUserRes.status).json(deletedUserRes);
         } catch (err: any) {
             console.log(err);
-            const backendError = err as ErrorResponse;
-            res.status(backendError.status).json(backendError.errors);
+            res.status(err.status).json(err.errors);
         }
     };
 }

@@ -43,8 +43,7 @@ export class AuthController {
             res.status(newUserRes.status).json(newUserRes);
         } catch (err: any) {
             console.log(err);
-            const backendError = err as ErrorResponse;
-            res.status(backendError.status).json(backendError.errors);
+            res.status(err.status).json(err.errors);
         }
     };
 }

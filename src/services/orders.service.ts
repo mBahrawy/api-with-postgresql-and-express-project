@@ -24,8 +24,7 @@ export class OrdersService {
             res.status(completedOrderRes.status).json(completedOrderRes);
         } catch (err: any) {
             console.log(err);
-            const backendError = err as ErrorResponse;
-            res.status(backendError.status).json(backendError.errors);
+            res.status(err.status).json(err.errors);
         }
     };
 
@@ -45,8 +44,7 @@ export class OrdersService {
             res.status(addedItemResponse.status).json(addedItemResponse);
         } catch (err: any) {
             console.log(err);
-            const backendError = err as ErrorResponse;
-            res.status(backendError.status).json(backendError.errors);
+            res.status(err.status).json(err.errors);
         }
     };
 }

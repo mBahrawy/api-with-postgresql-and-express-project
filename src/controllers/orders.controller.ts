@@ -16,8 +16,7 @@ export class OrdersController {
             res.status(orderRespose.status).json(orderRespose);
         } catch (err: any) {
             console.log(err);
-            const backendError = err as ErrorResponse;
-            res.status(backendError.status).json(backendError.errors);
+            res.status(err.status).json(err.errors);
         }
     };
 
@@ -27,8 +26,7 @@ export class OrdersController {
             res.status(ordersResponse.status).json(ordersResponse);
         } catch (err: any) {
             console.log(err);
-            const backendError = err as ErrorResponse;
-            res.status(backendError.status).json(backendError.errors);
+            res.status(err.status).json(err.errors);
         }
     };
 
@@ -50,8 +48,7 @@ export class OrdersController {
             res.status(newOrderResponse.status).json(newOrderResponse);
         } catch (err: any) {
             console.log(err);
-            const backendError = err as ErrorResponse;
-            res.status(backendError.status).json(backendError.errors);
+            res.status(err.status).json(err.errors);
         }
     };
 }

@@ -16,8 +16,7 @@ export class ProductsController {
             res.status(productsRes.status).json(productsRes);
         } catch (err: any) {
             console.log(err);
-            const backendError = err as ErrorResponse;
-            res.status(backendError.status).json(backendError.errors);
+            res.status(err.status).json(err.errors);
         }
     };
 
@@ -27,8 +26,7 @@ export class ProductsController {
             res.status(productRes.status).json(productRes);
         } catch (err: any) {
             console.log(err);
-            const backendError = err as ErrorResponse;
-            res.status(backendError.status).json(backendError.errors);
+            res.status(err.status).json(err.errors);
         }
     };
 
@@ -51,8 +49,7 @@ export class ProductsController {
             res.status(newProductRes.status).json(newProductRes);
         } catch (err: any) {
             console.log(err);
-            const backendError = err as ErrorResponse;
-            res.status(backendError.status).json(backendError.errors);
+            res.status(err.status).json(err.errors);
         }
     };
 
@@ -62,8 +59,7 @@ export class ProductsController {
             res.status(deletedProductRes.status).json(deletedProductRes);
         } catch (err: any) {
             console.log(err);
-            const backendError = err as ErrorResponse;
-            res.status(backendError.status).json(backendError.errors);
+            res.status(err.status).json(err.errors);
         }
     };
 }

@@ -15,8 +15,7 @@ export class ReviewsController {
             res.status(reviewRespose.status).json(reviewRespose);
         } catch (err: any) {
             console.log(err);
-            const backendError = err as ErrorResponse;
-            res.status(backendError.status).json(backendError.errors);
+            res.status(err.status).json(err.errors);
         }
     };
 
@@ -26,8 +25,7 @@ export class ReviewsController {
             res.status(reviewsResponse.status).json(reviewsResponse);
         } catch (err: any) {
             console.log(err);
-            const backendError = err as ErrorResponse;
-            res.status(backendError.status).json(backendError.errors);
+            res.status(err.status).json(err.errors);
         }
     };
 
@@ -43,8 +41,7 @@ export class ReviewsController {
             res.status(newReviewResponse.status).json(newReviewResponse);
         } catch (err: any) {
             console.log(err);
-            const backendError = err as ErrorResponse;
-            res.status(backendError.status).json(backendError.errors);
+            res.status(err.status).json(err.errors);
         }
     };
 }
