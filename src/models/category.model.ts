@@ -59,12 +59,20 @@ export class CategoriesModel {
     }
 
     async create(c: Category): Promise<CategoryResponse> {
-        const { serverError } = Container.get(ErrorResponsesService);
+        const { serverError, createError } = Container.get(ErrorResponsesService);
         try {
-            const sql = `INSERT INTO categories (name, description) VALUES($1, $2) RETURNING *`;
             const conn = await databaseClient.connect();
-            const result = await conn.query(sql, [c.name, c.description]);
-            const category = result.rows[0];
+
+            const checkCategorySql = `SELECT * FROM categories WHERE name=($1)`;
+            const checkCategoryResult = await conn.query(checkCategorySql, [c.name]);
+
+            if (checkCategoryResult.rowCount) {
+                return createError("Category name already exsists", 400);
+            }
+
+            const createCategorySql = `INSERT INTO categories (name, description) VALUES($1, $2) RETURNING *`;
+            const categoryResult = await conn.query(createCategorySql, [c.name, c.description]);
+            const category = categoryResult.rows[0];
             conn.release();
             return {
                 status: 201,

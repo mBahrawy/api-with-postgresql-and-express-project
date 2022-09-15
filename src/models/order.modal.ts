@@ -77,6 +77,10 @@ export class OrdersModel {
             const orderSql = `SELECT * FROM orders WHERE id=($1)`;
             const orderResult = await conn.query(orderSql, [id]);
 
+            if (!orderResult.rowCount) {
+                return createError("Order was not found", 404);
+            }
+
             // products related to these orders
             // eslint-disable-next-line max-len
             const relatedProductsSql = `SELECT products.id, products.name, products.price, products.category_id, order_products.quantity FROM order_products INNER JOIN products ON order_products.product_id = products.id WHERE order_id=($1)`;
@@ -137,7 +141,7 @@ export class OrdersModel {
             };
         } catch (err) {
             console.log(err);
-            throw serverError(err, "Could not get order.");
+            throw serverError(err, "Could not create order.");
         }
     }
 }

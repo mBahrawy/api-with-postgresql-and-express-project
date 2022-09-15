@@ -39,6 +39,13 @@ export class ErrorResponsesService {
             status: 400
         };
     }
+
+    public validationErrors(errors: any[]) {
+        return {
+            errors,
+            status: 400
+        };
+    }
     public serverError(error, msg = "Something went wrong, please try later") {
         const { createError } = Container.get(ErrorResponsesService);
         if (!!error?.code && error?.code.toString().length > 3) {
