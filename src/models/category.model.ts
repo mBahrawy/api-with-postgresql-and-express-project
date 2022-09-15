@@ -35,7 +35,7 @@ export class CategoriesModel {
 
     }
 
-    async show(id: string): Promise<CategoryResponse> {
+    async show(id: number): Promise<CategoryResponse> {
         const { createError, serverError } = Container.get(ErrorResponsesService);
 
         try {

@@ -22,7 +22,7 @@ export class CategoriesController {
 
     public show = async (req: Request, res: Response) => {
         try {
-            const categoryRes = await this._categoriesModel.show(req.params.id);
+            const categoryRes = await this._categoriesModel.show(Number(req.params.id));
             res.status(categoryRes.status).json(categoryRes);
         } catch (err: any) {
             console.log(err);
@@ -32,8 +32,7 @@ export class CategoriesController {
 
     public create = async (req: Request, res: Response) => {
         try {
-            const token = req.headers.authorization;
-            if (!token) throw new Error("Can't create category, check auth");
+            const token = req.headers.authorization as string;
             const userId = this._jwt.decodedToken(token).user.id as number;
 
             const category: Category = {

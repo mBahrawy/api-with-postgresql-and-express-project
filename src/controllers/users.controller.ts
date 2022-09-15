@@ -20,7 +20,7 @@ export class UsersController {
 
     public show = async (req: Request, res: Response) => {
         try {
-            const userRes = await this._usersModel.show(req.params.id);
+            const userRes = await this._usersModel.show(Number(req.params.id));
             res.status(userRes.status).json(userRes);
         } catch (err: any) {
             console.log(err);
@@ -30,7 +30,7 @@ export class UsersController {
 
     public destroy = async (req: Request, res: Response) => {
         try {
-            const deletedUserRes = await this._usersModel.destroy(req.params.id);
+            const deletedUserRes = await this._usersModel.destroy(Number(req.params.id));
             res.status(deletedUserRes.status).json(deletedUserRes);
         } catch (err: any) {
             console.log(err);

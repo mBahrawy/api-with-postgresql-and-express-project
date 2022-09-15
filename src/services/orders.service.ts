@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 import { ErrorResponsesService } from "./error-responses.service";
 import { Review } from "../interfaces/Review";
 import { OrderManagmnetModel } from "../models/order-managment.model";
-import { ErrorResponse } from "../interfaces/responses/ErrorResponse";
+import { JWT } from "./jwt.service";
 
 @Service()
 export class OrdersService {
@@ -12,6 +12,10 @@ export class OrdersService {
     public completeOrder = async (req: Request, res: Response) => {
         try {
             const { completeOrder } = Container.get(OrderManagmnetModel);
+            const { decodedToken } = Container.get(JWT);
+
+            const token = req.headers.authorization as string;
+            const userId = decodedToken(token).user.id as number;
 
             const id = Number(req.params.id) || Number(req.body.id);
             const service_rating = Number(req.body.service_rating);
@@ -20,7 +24,7 @@ export class OrdersService {
             let review: Review | null = null;
             id && service_rating && feedback && (review = { id, service_rating, feedback });
 
-            const completedOrderRes = await completeOrder(id, review);
+            const completedOrderRes = await completeOrder(id, userId, review);
             res.status(completedOrderRes.status).json(completedOrderRes);
         } catch (err: any) {
             console.log(err);
@@ -31,6 +35,11 @@ export class OrdersService {
     public addProduct = async (req: Request, res: Response) => {
         try {
             const { addProduct } = Container.get(OrderManagmnetModel);
+            const { decodedToken } = Container.get(JWT);
+
+            const token = req.headers.authorization as string;
+            const userId = decodedToken(token).user.id as number;
+
             const order_id = Number(req.params.id);
             const product_id = Number(req.body.product_id);
             const quantity = Number(req.body.quantity);
@@ -40,7 +49,7 @@ export class OrdersService {
                 return;
             }
 
-            const addedItemResponse = await addProduct(quantity, order_id, product_id);
+            const addedItemResponse = await addProduct(quantity, order_id, product_id, userId);
             res.status(addedItemResponse.status).json(addedItemResponse);
         } catch (err: any) {
             console.log(err);

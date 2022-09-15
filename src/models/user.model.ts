@@ -31,7 +31,7 @@ export class UsersModel {
         }
     }
 
-    async show(id: string): Promise<UserResponse> {
+    async show(id: number): Promise<UserResponse> {
         const { createError, serverError } = Container.get(ErrorResponsesService);
         try {
 
@@ -54,7 +54,7 @@ export class UsersModel {
         }
     }
 
-    async destroy(id: string): Promise<FeedbackResponse | ErrorResponse> {
+    async destroy(id: number): Promise<FeedbackResponse | ErrorResponse> {
         const { createError, serverError } = Container.get(ErrorResponsesService);
         try {
             const sql = `DELETE FROM users WHERE id=($1)`;

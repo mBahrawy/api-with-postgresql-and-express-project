@@ -7,16 +7,32 @@ import cors from "cors";
 import * as dotenv from "dotenv";
 import { Container } from "typedi";
 import { CreateAdmin } from "./services/create-admin.service";
+import { exit } from "node:process";
 
 // Defining app base folder
 global.__basedir = __dirname;
 
-// eslint-disable-next-line no-console
-process.env.NODE_ENV ? console.log(`App started in ${process.env.NODE_ENV} mode`) : console.log("Error, Undefined app mode");
 
-dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
 
-const PORT = process.env.APP_BACKEND_PORT || 3000;
+const { NODE_ENV, APP_BACKEND_PORT_DEVELOPMENT, APP_BACKEND_PORT_PRODUCTION, APP_BACKEND_PORT_TEST } = process.env;
+
+if (NODE_ENV) {
+    console.log(`App started in ${NODE_ENV} mode`);
+} else {
+    console.log("Error, Undefined app mode, check .env file.");
+    exit(1);
+}
+
+dotenv.config();
+
+let PORT;
+NODE_ENV === "development" && (PORT = APP_BACKEND_PORT_DEVELOPMENT);
+NODE_ENV === "production" && (PORT = APP_BACKEND_PORT_PRODUCTION);
+NODE_ENV === "test" && (PORT = APP_BACKEND_PORT_TEST);
+
+// Creating admin
+const { createAdmin } = Container.get(CreateAdmin);
+createAdmin();
 
 // create an instance server
 const app: Application = express();
@@ -40,10 +56,5 @@ app.listen(PORT, () => {
     // eslint-disable-next-line no-console
     console.log(`Server is starting at port: ${PORT}`);
 });
-
-
-// Creating admin
-const { createAdmin } = Container.get(CreateAdmin);
-createAdmin();
 
 export default app;

@@ -4,10 +4,9 @@ import { User } from "../../interfaces/User";
 import { AuthService } from "./../../services/auth.service";
 import { Container } from "typedi";
 
-
 describe("Product modal", () => {
     const { register } = Container.get(AuthService);
-    const { index, show, destroy } = new UsersModel();
+    const { index, show, destroy } = Container.get(UsersModel);
 
     describe("Check user model method exists", () => {
         it("should have index users method", () => expect(index).toBeDefined());
@@ -16,33 +15,24 @@ describe("Product modal", () => {
     });
 
     describe("Test user model methods functionality", () => {
-        // it("should create a user", async () => {
-        //     const user: User = {
-        //         firstname: "dummyUser",
-        //         lastname: "dummyUser",
-        //         username: "dummyUser",
-        //         email: "dummyUser@dummyUser.com",
-        //         password: "dummyUser",
-        //         role: "regular"
-        //     };
-
-        //     const result = await create(user);
-        //     expect(result.status).toEqual(201);
-        // });
-
         it("should get a user", async () => {
+            console.log("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh");
+
             // Create a user to be displayed
             const user: User = {
                 firstname: "dummyUser",
                 lastname: "dummyUser",
-                username: "dummyUser3",
-                email: "dummyUser3@dummyUser.com",
+                username: "dummyUser32",
+                email: "dummyUser32@dummyUser.com",
                 password: "dummyUser",
                 role: "regular"
             };
             const userResponse = await register(user);
-            const userId = userResponse.user?.id;
-            const result = await show(`${userId}`);
+            const userId = userResponse.user?.id as number;
+            const result = await show(userId);
+
+            console.log(result);
+
             expect(result.status).toEqual(200);
         });
 
@@ -56,16 +46,19 @@ describe("Product modal", () => {
             const user: User = {
                 firstname: "dummyUser",
                 lastname: "dummyUser",
-                username: "dummyUser2",
-                email: "dummyUser2@dummyUser.com",
+                username: "dummyUser42",
+                email: "dummyUser42@dummyUser.com",
                 password: "dummyUser",
                 role: "regular"
             };
             const userResponse = await register(user);
-            const userId = userResponse.user?.id;
+            const userId = userResponse.user?.id as number;
 
             // Appley delete
-            const result = await destroy(`${userId}`);
+            const result = await destroy(userId);
+
+            console.log(result);
+
             expect(result.status).toEqual(200);
         });
     });

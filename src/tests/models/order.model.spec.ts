@@ -3,11 +3,13 @@ import { Product } from "../../interfaces/Product";
 import { OrdersModel } from "./../../models/order.modal";
 import { ProductsModel } from "../../models/product.model";
 import { Order } from "./../../interfaces/Order";
-
+import { User } from "../../interfaces/User";
+import { AuthService } from "../../services/auth.service";
+import Container from "typedi";
 
 describe("Order modal", () => {
-    const productsModel = new ProductsModel();
-    const { index, show, create } = new OrdersModel();
+    const { index, show, create } = Container.get(OrdersModel);
+    const { register } = Container.get(AuthService);
 
     describe("Check order model method exists", () => {
         it("should have index orders method", () => expect(index).toBeDefined());
@@ -17,33 +19,59 @@ describe("Order modal", () => {
 
     describe("Test order model methods functionality", () => {
         it("should create an order", async () => {
-            const product: Product = {
-                name: "Dummy product for order model test",
-                price: 3000,
-                stock: 20,
-                user_id: 1
+            const user: User = {
+                firstname: "DummyUser",
+                lastname: "DummyUser",
+                username: "DummyUser12",
+                email: "DummyUser12@DummyUser.com",
+                password: "DummyUser",
+                role: "regular"
             };
 
-            const productResponse = await productsModel.create(product);
+            const userReponse = await register(user);
+            const orderOwnerId = userReponse.user?.id as number;
 
-            const productId = productResponse.product?.id;
-
-            const order: Order = {
+            const result = await create(null, orderOwnerId);
+            expect(result.order).toEqual({
+                id: 3,
                 status: "open",
-                products: [{ id: productId, quantity: 2 }]
-            };
-            const result = await create(order);
-            expect(result.status).toEqual(201);
+                total: 0,
+                user_id: 4,
+                products: [],
+                review: null
+            });
         });
 
         it("should get all orders", async () => {
             const result = await index();
-            expect(result.status).toEqual(200);
+            expect(Array.isArray(result.orders)).toBeTrue();
         });
 
-        it("should get a an order with id=1", async () => {
-            const result = await show("1");
-            expect(result.status).toEqual(200);
+        it("should get a single order with id", async () => {
+            const user: User = {
+                firstname: "DummyUser",
+                lastname: "DummyUser",
+                username: "DummyUser16",
+                email: "DummyUser16@DummyUser.com",
+                password: "DummyUser",
+                role: "regular"
+            };
+
+            const userReponse = await register(user);
+            const orderOwnerId = userReponse.user?.id as number;
+
+            const orderResponse = await create(null, orderOwnerId);
+            const orderId = orderResponse.order?.id as number;
+
+            const result = await show(orderId);
+            expect(result.order).toEqual({
+                id: orderId,
+                status: "open",
+                total: 0,
+                user_id: orderOwnerId,
+                products: [],
+                review: null
+            });
         });
     });
 });

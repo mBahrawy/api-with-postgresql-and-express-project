@@ -1,8 +1,10 @@
 import { DisplayProcessor, StacktraceOption } from "jasmine-spec-reporter";
 import { SpecReporter } from "jasmine-spec-reporter";
+import { Service } from "typedi";
 import SuiteInfo = jasmine.SuiteInfo;
 
-class CustomProcessor extends DisplayProcessor {
+@Service()
+export class CustomProcessor extends DisplayProcessor {
     public displayJasmineStarted(info: SuiteInfo, log: string): string {
         return `TypeScript ${log}`;
     }

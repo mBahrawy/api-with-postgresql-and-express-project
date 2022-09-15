@@ -3,10 +3,11 @@ import { Product } from "../../interfaces/Product";
 import { ProductsModel } from "../../models/product.model";
 import { CategoriesModel } from "./../../models/category.model";
 import { Category } from "./../../interfaces/Category";
+import Container from "typedi";
 
 describe("Product modal", () => {
-    const categoriesModel = new CategoriesModel();
-    const { index, show, create, destroy } = new ProductsModel();
+    const categoriesModel = Container.get(CategoriesModel);
+    const { index, show, create, destroy } = Container.get(ProductsModel);
 
     beforeAll(async (): Promise<void> => {
         try {
@@ -42,21 +43,39 @@ describe("Product modal", () => {
             };
 
             const result = await create(product);
-            expect(result.status).toEqual(201);
+            expect(result.product?.name).toEqual("Dummy product for product model test");
         });
 
-        it("should get a products with id=1", async () => {
-            const result = await show("1");
-            expect(result.status).toEqual(200);
+        it("should get a single products with id", async () => {
+            const user_id = 1;
+            const category_id = null;
+
+            const product: Product = {
+                name: "Dummy product for product model test",
+                price: 3000,
+                stock: 20,
+                user_id,
+                category_id
+            };
+            const productResult = await create(product);
+            const productId = productResult.product?.id as number;
+
+            expect(productResult.product).toEqual({
+                id: productId,
+                name: "Dummy product for product model test",
+                stock: 20,
+                price: 3000,
+                user_id: user_id,
+                category_id: null
+            });
         });
 
         it("should get all products", async () => {
             const result = await index();
-            expect(result.status).toEqual(200);
+            expect(Array.isArray(result.products)).toBeTrue();
         });
 
         it("should delete a product", async () => {
-            // Create a product to be deleted
             const product: Product = {
                 name: "Dummy product for product model test, test delete method",
                 price: 3000,
@@ -65,11 +84,10 @@ describe("Product modal", () => {
             };
 
             const productResponse = await create(product);
-            const productId = productResponse.product?.id;
+            const productId = productResponse.product?.id as number;
 
-            // Appley delete
-            const result = await destroy(`${productId}`);
-            expect(result.status).toEqual(200);
+            const result = await destroy(productId);
+            expect(result.message).toEqual(`Product with ID: ${productId} was deleted`);
         });
     });
 });

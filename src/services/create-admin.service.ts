@@ -4,7 +4,7 @@ import { AuthService } from "./auth.service";
 import databaseClient from "../database";
 import * as dotenv from "dotenv";
 
-dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
+dotenv.config();
 
 @Service()
 export class CreateAdmin {

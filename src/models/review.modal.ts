@@ -66,7 +66,7 @@ export class ReviewsModel {
         try {
             const { show: getOrder } = Container.get(OrdersModel);
 
-            const order = await getOrder(`${r.id}`);
+            const order = await getOrder(r.id as number);
 
             if (order.order?.status !== "completed") {
                 return createError("The relative order is not completed yet.", 400);

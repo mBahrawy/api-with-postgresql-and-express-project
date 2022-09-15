@@ -2,7 +2,6 @@ import { Service } from "typedi";
 import { Request, Response } from "express";
 import { ErrorResponsesService } from "./error-responses.service";
 import { ProductManagmentModel } from "../models/product-managment.model.ts";
-import { ErrorResponse } from "../interfaces/responses/ErrorResponse";
 
 @Service()
 export class ProductsService {

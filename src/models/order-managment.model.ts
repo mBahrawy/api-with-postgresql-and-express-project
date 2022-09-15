@@ -11,9 +11,9 @@ interface OrderResponse extends ErrorResponse {
 
 @Service()
 export class OrderManagmnetModel {
-    public async addProduct(quantity: number, order_id: number, product_id: number): Promise<OrderResponse> {
-        
-const { createError, serverError } = Container.get(ErrorResponsesService);
+    public async addProduct(quantity: number, order_id: number, product_id: number, user_id: number): Promise<OrderResponse> {
+        const { createError, serverError } = Container.get(ErrorResponsesService);
+
         try {
             const conn = await databaseClient.connect();
 
@@ -21,6 +21,15 @@ const { createError, serverError } = Container.get(ErrorResponsesService);
             const orderSql = `SELECT * FROM orders WHERE id=($1)`;
             const orderResult = await conn.query(orderSql, [order_id]);
             const order = orderResult.rows[0] as Order;
+
+            if (orderResult.rowCount === 0) {
+                return createError("Order was not found", 404);
+            }
+
+            // Check order owner
+            if (order.user_id != user_id) {
+                return createError("You don't have right access to do this acction", 403);
+            }
 
             if (order.status !== "open") {
                 return createError(`Could not add product ${product_id} to order ${order_id} because order status is ${order.status}`, 422);
@@ -57,7 +66,7 @@ const { createError, serverError } = Container.get(ErrorResponsesService);
         }
     }
 
-    public async completeOrder(order_id: number, review: Review | null): Promise<OrderResponse> {
+    public async completeOrder(order_id: number, user_id: number, review: Review | null): Promise<OrderResponse> {
         const { createError, serverError } = Container.get(ErrorResponsesService);
         try {
             const conn = await databaseClient.connect();
@@ -69,6 +78,11 @@ const { createError, serverError } = Container.get(ErrorResponsesService);
 
             if (orderResult.rowCount === 0) {
                 return createError("Order was not found", 404);
+            }
+
+            // Check order owner
+            if (order.user_id != user_id) {
+                return createError(`You don't have right access to do this acction`, 403);
             }
 
             if (order.status !== "open") {

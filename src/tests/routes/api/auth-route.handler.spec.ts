@@ -17,11 +17,11 @@ describe("Check login routes", () => {
 
     it("should user register successfully", async (): Promise<void> => {
         const response: supertest.Response = await request.post("/register").send({
-            firstname: "user",
-            lastname: "user",
-            username: "user123",
-            email: "user123@user.com",
-            password: "user123"
+            firstname: "xyz",
+            lastname: "xyz",
+            username: "xyz",
+            email: "xyz@xyz.com",
+            password: "xyz123"
         });
         expect(response.type).toBe("application/json");
         expect(response.status).toBe(201);
@@ -29,8 +29,8 @@ describe("Check login routes", () => {
 
     it("should user login successfully", async (): Promise<void> => {
         const response: supertest.Response = await request.post("/login").send({
-            username: "user123",
-            password: "user123"
+            username: "xyz",
+            password: "xyz123"
         });
         expect(response.type).toBe("application/json");
         expect(response.status).toBe(200);

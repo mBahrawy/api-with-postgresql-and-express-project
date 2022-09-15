@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import myCustomValidationResult from "../services/express-validator-formatter.service";
+import myCustomValidationResult from "../tests/helpers/express-validator-formatter";
 
 const emitError = (req: Request, res: Response, next: Function) => {
     const errors = myCustomValidationResult(req);

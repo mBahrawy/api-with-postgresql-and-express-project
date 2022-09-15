@@ -50,14 +50,23 @@ export class AuthService {
     };
 
     async register(u: User): Promise<UserResponse> {
-        const { serverError } = Container.get(ErrorResponsesService);
+        const { serverError, createError } = Container.get(ErrorResponsesService);
         try {
-            // eslint-disable-next-line max-len
-            const sql = `INSERT INTO users (firstname, lastname, username, email, role, password_digist) VALUES($1, $2, $3, $4, $5, $6) RETURNING *`;
             const conn = await databaseClient.connect();
+            // eslint-disable-next-line max-len
+
+            const checkSql = `SELECT * FROM users WHERE username=($1) OR email=($2)`;
+            const checkResult = await conn.query(checkSql, [u.username, u.email]);
+
+            if (checkResult.rowCount) {
+                return createError("Email or Username is already exsists.", 400);
+            }
+
+            // eslint-disable-next-line max-len
+            const createSql = `INSERT INTO users (firstname, lastname, username, email, role, password_digist) VALUES($1, $2, $3, $4, $5, $6) RETURNING *`;
             const hashedPassword = bcrypt.hashSync(u.password + pepper, parseInt(saltRounds));
-            const result = await conn.query(sql, [u.firstname, u.lastname, u.username, u.email, u.role, hashedPassword]);
-            const user = result.rows[0];
+            const createResult = await conn.query(createSql, [u.firstname, u.lastname, u.username, u.email, u.role, hashedPassword]);
+            const user = createResult.rows[0];
             conn.release();
             delete user.password_digist;
             return {

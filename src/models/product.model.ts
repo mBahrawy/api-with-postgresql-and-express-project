@@ -76,7 +76,7 @@ export class ProductsModel {
         }
     }
 
-    public async destroy(id: string): Promise<FeedbackResponse | ErrorResponse> {
+    public async destroy(id: number): Promise<FeedbackResponse | ErrorResponse> {
         const { createError, serverError } = Container.get(ErrorResponsesService);
 
         try {

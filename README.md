@@ -17,12 +17,19 @@ First, open terminal inside project directory, and run these commands
 -   `npm run test` for running implemneted unit tests (through port will be 6000).
 
 ## Used ports:
-| Port              | Usage                           | Location           |
-| ----------------- | ------------------------------- | ------------------ |
-| 4000              | running app in development mode | `.env.development` |
-| 6000              | running app tests               | `.env.test`        |  
-| 8000              | running app in production mode  | `.env.production`  |
-| 5432              | Postgres Database               | All env files      |
+| Port              | Usage                           |
+| ----------------- | ------------------------------- |
+| 4000              | running app in development mode |
+| 6000              | running app tests               |  
+| 8000              | running app in production mode  |
+| 5432              | Postgres Database               |
+
+## Users and roles
+| Role              | Description                           |
+| ----------------- | ------------------------------------- |
+| Admin             | An admminstrator for the for  the app, will be create once at the first time you start the app. You can change login info for the `.env` file. |
+| Regular           | Normal user, or clint                 |  
+
 
 ## Application API documentation:
 - Used Authentication type is `Bearer` by JWT plugin    
@@ -60,86 +67,42 @@ First, open terminal inside project directory, and run these commands
 
 
 
-## Application environments:
-
--   `.env.development`
--   `.env.production`
--   `.env.test`
-
-### 1. For development
-
-create `.env.development` file in add directory
+## Application environment file:
+Create `.env` in app directory
 
 ```
-NODE_ENV=development
-
-APP_BACKEND_BASE_URL=http://localhost
-APP_BACKEND_PORT=4000
-
-POSTGRES_DATABASE=store_front
-POSTGRES_HOST=127.0.0.1
-POSTGRES_USERNAME=root
-POSTGRES_PASSWORD=root
-POSTGRES_PORT=5432
-
-BCRYPT_PASSWORD=kG5tfs
-SALT_ROUNDS=8
-TOKEN_SECRET=JWTTOKENSERCRET
-
+# Auto genrated admin account on first time loading the application
 ADMIN_NAME=first_admin
 ADMIN_EMAIL=first_admin@admin
 ADMIN_PASSWORD=Admin123
-```
 
-### 2. For production
+# Application ports
+APP_BACKEND_PORT_DEVELOPMENT=4000
+APP_BACKEND_PORT_PRODUCTION=5000
+APP_BACKEND_PORT_TEST=6000
 
-create `.env.production` file in add directory
+# Application base url/domains
+APP_BACKEND_BASE_URL_development=http://localhost
+APP_BACKEND_BASE_URL_production=http://localhost
+APP_BACKEND_BASE_URL_test=http://localhost
 
-```
-NODE_ENV=production
+# Application databases
+POSTGRES_DATABASE_development=store_front
+POSTGRES_DATABASE_production=store_front_dev
+POSTGRES_DATABASE_test=store_front_test
 
-APP_BACKEND_BASE_URL=http://localhost
-APP_BACKEND_PORT=5000
-
-POSTGRES_DATABASE=store_front
+# Postgres databse connection
 POSTGRES_HOST=127.0.0.1
 POSTGRES_USERNAME=root
 POSTGRES_PASSWORD=root
 POSTGRES_PORT=5432
 
-BCRYPT_PASSWORD=kds7ys.8G5s7ys.8$%tfs
-SALT_ROUNDS=10
+# JWD securing tokens
+BCRYPT_PASSWORD=kds7ys.8G5$%tfs
+SALT_ROUNDS=12
 TOKEN_SECRET=JWTTOKENSERCRET
-
-ADMIN_NAME=first_admin
-ADMIN_EMAIL=first_admin@admin
-ADMIN_PASSWORD=Xds7ys.8G23.43f*gs^R
 ```
 
-### 3. For testing
-
-create `.env.test` file in add directory
-
-```
-NODE_ENV=development
-
-APP_BACKEND_BASE_URL=http://localhost
-APP_BACKEND_PORT=4000
-
-POSTGRES_DATABASE=store_front
-POSTGRES_HOST=127.0.0.1
-POSTGRES_USERNAME=root
-POSTGRES_PASSWORD=root
-POSTGRES_PORT=5432
-
-BCRYPT_PASSWORD=kG5tfs
-SALT_ROUNDS=8
-TOKEN_SECRET=JWTTOKENSERCRET
-
-ADMIN_NAME=first_admin
-ADMIN_EMAIL=first_admin@admin
-ADMIN_PASSWORD=Admin123
-```
 
 ## Database setup and configration:
 

@@ -32,9 +32,7 @@ export class ProductsController {
 
     public create = async (req: Request, res: Response) => {
         try {
-            const token = req.headers.authorization;
-            if (!token) throw new Error("Can't create product, check auth");
-
+            const token = req.headers.authorization as string;
             const user_id = this._jwt.decodedToken(token).user.id as number;
 
             const product: Product = {
@@ -55,7 +53,7 @@ export class ProductsController {
 
     public destroy = async (req: Request, res: Response) => {
         try {
-            const deletedProductRes = await this._productsModel.destroy(req.params.id);
+            const deletedProductRes = await this._productsModel.destroy(Number(req.params.id));
             res.status(deletedProductRes.status).json(deletedProductRes);
         } catch (err: any) {
             console.log(err);

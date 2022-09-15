@@ -67,7 +67,7 @@ export class OrdersModel {
         }
     }
 
-    public async show(id: string): Promise<OrderResponse> {
+    public async show(id: number): Promise<OrderResponse> {
         const { createError, serverError } = Container.get(ErrorResponsesService);
 
         try {
@@ -111,8 +111,7 @@ export class OrdersModel {
         }
     }
 
-    public async create(o: Order | null): Promise<OrderResponse> {
-
+    public async create(o: Order | null, user_id: number): Promise<OrderResponse> {
         const { serverError } = Container.get(ErrorResponsesService);
         try {
             const { addProduct } = Container.get(OrderManagmnetModel);
@@ -120,13 +119,12 @@ export class OrdersModel {
 
             const conn = await databaseClient.connect();
             const createOrderSql = `INSERT INTO orders (status, total, user_id) VALUES($1, $2, $3) RETURNING *`;
-            const createOrderResult = await conn.query(createOrderSql, [o?.status || "open", o?.total || 0, o?.user_id]);
+            const createOrderResult = await conn.query(createOrderSql, ["open", 0, user_id]);
 
             if (o?.products) {
                 const productsInOrder: OrderItem[] = [...o.products];
-
                 for (let i = 0; o.products.length > i; i++) {
-                    await addProduct(productsInOrder[i].quantity, createOrderResult.rows[0].id, Number(productsInOrder[i].id));
+                    await addProduct(productsInOrder[i].quantity, createOrderResult.rows[0].id, Number(productsInOrder[i].id), user_id);
                 }
             }
 
