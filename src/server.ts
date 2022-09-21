@@ -15,7 +15,7 @@ global.__basedir = __dirname;
 dotenv.config();
 const { NODE_ENV, APP_BACKEND_PORT_DEVELOPMENT, APP_BACKEND_PORT_PRODUCTION, APP_BACKEND_PORT_TEST } = process.env;
 
-console.log(process.env);
+console.log("NODE_ENV--->", NODE_ENV);
 
 
 if (NODE_ENV) {
