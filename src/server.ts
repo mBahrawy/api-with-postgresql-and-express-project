@@ -12,9 +12,11 @@ import { exit } from "node:process";
 // Defining app base folder
 global.__basedir = __dirname;
 
-
-
+dotenv.config();
 const { NODE_ENV, APP_BACKEND_PORT_DEVELOPMENT, APP_BACKEND_PORT_PRODUCTION, APP_BACKEND_PORT_TEST } = process.env;
+
+console.log(process.env);
+
 
 if (NODE_ENV) {
     console.log(`App started in ${NODE_ENV} mode`);
@@ -22,8 +24,6 @@ if (NODE_ENV) {
     console.log("Error, Undefined app mode, check .env file.");
     exit(1);
 }
-
-dotenv.config();
 
 let PORT;
 NODE_ENV === "development" && (PORT = APP_BACKEND_PORT_DEVELOPMENT);
