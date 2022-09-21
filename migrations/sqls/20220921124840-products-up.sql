@@ -3,5 +3,6 @@ CREATE TABLE products(
     name VARCHAR(150) NOT NULL,
     stock INT NOT NULL CHECK (stock >= 0),
     price FLOAT NOT NULL CHECK (price >= 0),
-    user_id INT REFERENCES users(id)
+    user_id INT REFERENCES users(id),
+    category_id INT REFERENCES categories(id)
 )

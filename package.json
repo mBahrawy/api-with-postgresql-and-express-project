@@ -5,9 +5,9 @@
   "main": "server.ts",
   "scripts": {
     "watch": "tsc-watch --esModuleInterop src/server.ts --outDir ./dist --onSuccess 'node build/server.js'",
-    "start": "set NODE_ENV=development&& npm run migrate:dev && nodemon --watch ./src/**/*.ts --exec ts-node ./src/server.ts",
+    "start": "set NODE_ENV=production&& npm run migrate:prod && node build/server.js",
+    "start:dev": "set NODE_ENV=development&& npm run migrate:dev && nodemon --watch ./src/**/*.ts --exec ts-node ./src/server.ts",
     "build": "rimraf build && set NODE_ENV=production&& npx tsc",
-    "serve": "set NODE_ENV=production&& npm run migrate:prod && node build/server.js",
     "migrate:dev": "db-migrate --env development down && db-migrate --env development up",
     "migrate:test": "db-migrate --env test down && db-migrate --env test up",
     "migrate:prod": "db-migrate --env production down && db-migrate --env production up",

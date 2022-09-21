@@ -1,1 +1,0 @@
-ALTER TABLE reviews ADD CONSTRAINT reviews_pkey  PRIMARY KEY  (id);
